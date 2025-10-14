@@ -1,0 +1,2 @@
+# aims25
+A repository for all the coursework of the AIMS CDT, 2025 at the University of Oxford
