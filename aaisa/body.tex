@@ -1,27 +1,65 @@
 \section{Problem Definition}
 
 \paragraph{Alignment failure modes}
-
+% The 5 failure modes of alignment, in brief. Reward Hacking, Goal Misgeneralization, Scheming, Sandbagging, Sycophancy
 
 \paragraph{Goal Misgeneralization in Robot Learning}
+% Goal misgeneralization deep dive. What is it, focus on spurious correlation
+
+% In robot learning it is particularly pressing because of Sim2Real approach
 
 \paragraph{Goal Misgeneralization in the Inner vs. Outer Alignment Framework}
 
+% Situate GM in the context of inner outer alignment
+
+% Argue for why it is an inner alignment problem, explaining why is not an outer problem
+
 \paragraph{An Example: Tidying Up by Preventing Access}
+
+% Physical turing Test as per Jim Fan's argument
+
+% Present an example where the goal depends on not registering presence of humans in an environment
+
+% At train time, in simulation, no external disturbance besides the mess up is presented
+
+% At test time, whenever humans walk in that is read as a disturbance
+
+% That can be read as something to remove if GM was to occurr, resulting in a failure
 
 \paragraph{Why Does This Matter in Frontier AI?}
 
+% Robotics is advancing at an unprecendented rate
+
+% Robots will be coming into the home. Further, they are increasingly developed in accordance to the pre-training/fine-tuning paradigm
+
+% Gemini Robotics directly uses the weights of Gemini, so the boundary between Digital and Physical AI are also blurring
+
 \section{Evaluation Design}
+
+% How can you measure whether GM is occurring, besides practical rollouts during training
 
 \paragraph{Interpretability}
 
+% Develop a circuit to understand if the room is being cleared because mess is already present or if it is clean by keeping it clean
+
 \paragraph{A Proposal: Discovering Circuits starting from frames}
 
-% add an improvement to circuit discovery to make this approach more robust
+% What is a circuit in the context of interpretability
+
+% Circuits in robot learning are not common at all
 
 \section{Governance and Policy}
 
+% like airplanes and cars, physical robots will have to undergo scrutinuous regulation before being rolled out to the general public
+
+% governments have a much more direct way of stepping in that with purely digital systems, which derives from the higher risks associated with physical AIs
+
 \paragraph{Regulating by Guaranteeing Interpretable Outcomes}
 
+% Enforcing interpretability and the presence of some circuits might reduce this risk
+
+% Also, using Behavioral Cloning instead of Sim2Real RL might also be a solution because of the fact preferences are directly encoded in the demonstrations
+
 \subsection{Limitations}
-% specify that circuits cannot be considered self contained in general
+% specify that circuits cannot be considered the silver bullet in general
+
