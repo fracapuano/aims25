@@ -1,0 +1,53 @@
+This is BibTeX, Version 0.99d (TeX Live 2025)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main.aux
+The style file: plainnat.bst
+Database file #1: main.bib
+Reallocated buffer (elt_size=1) to 40000 items from 20000.
+Reallocated sv_buffer (elt_size=1) to 40000 items from 20000.
+Reallocated ex_buf (elt_size=1) to 40000 items from 20000.
+Reallocated out_buf (elt_size=1) to 40000 items from 20000.
+Reallocated name_tok (elt_size=4) to 40000 items from 20000.
+Reallocated name_sep_char (elt_size=1) to 40000 items from 20000.
+Reallocated str_pool (elt_size=1) to 130000 items from 65000.
+You've used 17 entries,
+            2773 wiz_defined-function locations,
+            708 strings with 38480 characters,
+and the built_in function-call counts, 84597 in all, are:
+= -- 5220
+> -- 14455
+< -- 4
++ -- 4820
+- -- 4803
+* -- 9894
+:= -- 15044
+add.period$ -- 44
+call.type$ -- 17
+change.case$ -- 1651
+chr.to.int$ -- 17
+cite$ -- 34
+duplicate$ -- 289
+empty$ -- 574
+format.name$ -- 4822
+if$ -- 15412
+int.to.chr$ -- 1
+int.to.str$ -- 1
+missing$ -- 4
+newline$ -- 86
+num.names$ -- 69
+pop$ -- 3351
+preamble$ -- 1
+purify$ -- 1635
+quote$ -- 0
+skip$ -- 1805
+stack$ -- 0
+substring$ -- 75
+swap$ -- 32
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 182
+warning$ -- 0
+while$ -- 55
+width$ -- 0
+write$ -- 200

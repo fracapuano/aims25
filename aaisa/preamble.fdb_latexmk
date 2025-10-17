@@ -1,0 +1,13 @@
+# Fdb version 4
+["pdflatex"] 1760642984.95685 "/Users/fracapuano/Desktop/personal/aims25/aaisa/preamble.tex" "preamble.pdf" "preamble" 1760642985.13526 2
+  "/Users/fracapuano/Desktop/personal/aims25/aaisa/preamble.tex" 1760615595.45179 1424 3a9e338fe6a92bf1135927c7f991d631 ""
+  "/usr/local/texlive/2025/texmf-dist/web2c/texmf.cnf" 1739380943 42148 61becc7c670cd061bb319c643c27fdd4 ""
+  "/usr/local/texlive/2025/texmf-var/web2c/pdftex/pdflatex.fmt" 1756208917 3345738 bbbb93a25a0c937f0c0915ef8b1d5cd7 ""
+  "/usr/local/texlive/2025/texmf.cnf" 1741450484 577 418a7058ec8e006d8704f60ecd22c938 ""
+  "preamble.aux" 0 -1 0 "pdflatex"
+  "preamble.tex" 1760615595.45179 1424 3a9e338fe6a92bf1135927c7f991d631 ""
+  (generated)
+  "preamble.aux"
+  "preamble.log"
+  "preamble.pdf"
+  (rewritten before read)

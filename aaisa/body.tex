@@ -89,23 +89,21 @@ Thus, while circuits enhance transparency, their practical performance might imp
 Ideally, the practical implemenetation of autonomous systems in the real-world would be based on a holistic safety strategy integrating interpretability, challenging behavioral evaluation all with rigorous governance oversight to ensure safety standards are met.
 
 \section{Governance and Policy}
+Just like the aviation and automotive industries, it is reasonable to expect the robotics industry to face regulatory scrutiny, ensuring robots met security standards both before and while being integrated into society.
+Indeed, unlike purely digital systems, embodied AI operates in physical spaces that are shared with humans, so that failures can cause direct physical harm.
+Therefore, given their tangible risks and similarity with automotive and aviation precedents, it is rational to expect governmental institutions to seek clear jurisdiction, developing incentives to impose strict safety standards said systems, which could be enforced in practice by establishing comprehensive evaluation and interpretability requirements as a prerequisite for certification.
 
-Physical robots, like airplanes and cars, will inevitably face rigorous regulatory scrutiny before being integrated into society.
-Unlike purely digital systems, embodied AI operates in shared physical spaces, where failures can cause direct harm.
-Governments have clearer jurisdiction and stronger incentives to impose strict safety standards on such systems, given their tangible risks.
-Establishing comprehensive evaluation and interpretability requirements could become a prerequisite for certification.
-This framework parallels historical precedents in aviation and automotive safety, where testing and transparency became central to public trust.
+\paragraph{ICAO-like Governance for Decentralized and Unbalanced AI Regulation}
+The \emph{highly interconnected and international nature} of developments in the field of AI poses severe challenges to the power of any single country to regulate this technology. 
+Further, industry players' outsized influence in developing Frontier AI technologies poses severe \emph{risks to the sovereignity of individual nation states}, resulting in further governance challenges in addressing general AI development in an internationally non-coordinated manner.
+A possible solution to this challenge would be the development of governance structures for (physical-) AI systems inspired from international regulatory bodies such as the International Civil Aviation Organization (ICAO), which harmonizes safety standards, certification procedures, and operational oversight \emph{across} nations.
 
-\paragraph{Regulating by Guaranteeing Interpretable Outcomes}
-Regulators could mandate interpretability as a safety guarantee, requiring that deployed robots possess demonstrable circuits corresponding to key behavioral goals.
+A comparable framework for rolling out robot learning in practice could consist on shared safety benchmarks, as well as standardized interpretability requirements and transparent reporting protocols among manufacturers and research labs. 
+Such an international alignment body could facilitate responsible scaling by ensuring that safety evaluations, including interpretability audits or robustness benchmarks, are conducted and validated under unified global standards, rather than fragmented national guidelines.
+This approach could foster cross-border accountability and mitigate the risk of a regulatory "race to the bottom", where looser jurisdictions attract unsafe or opaque deployments, by enforcing regulatory standards through the \emph{positive externalities} of agreeing on specific standards.
+Critically, differently from more established sectors like aviation, definitive inspections of models internals are rarely feasible at the present time, due the (currently) \emph{fundamentally uninterpretable} nature of autonomous systems, whose internal logic cannot be easily dissected, exhaustively verified and thus audited.
+As a result of this fundamental regulatory limitation, oversight agencies might face fundamental uncertainties about the completeness and reliability of interpretability assessments, making post-certification monitoring and dynamic evaluation a critical complement to static regulation.
+
+Considering the practical example of house robots, regulators could mandate interpretability as a crucial safety guarantee, requiring that deployed robots possess \emph{demonstrable circuits} corresponding to key behavioral goals.
 By enforcing visibility into how decisions are made, authorities can reduce the likelihood of undetected goal misgeneralization.
-Moreover, adopting behavioral cloning from human demonstrations instead of purely reinforcement-based learning may offer a safer alternative.
-In such setups, human preferences are encoded directly through data rather than indirectly through reward optimization.
-This approach prioritizes alignment with human intent by design rather than through post hoc correction.
-
-\subsection{Limitations}
-Circuits cannot be considered a universal solution to alignment failures.
-While they offer valuable insights into model reasoning, complex behaviors may emerge from distributed representations that defy simple mechanistic interpretation.
-Additionally, interpretability constraints might reduce performance or introduce new forms of gaming if models learn to mimic interpretable structures without genuine understanding.
-Thus, while circuits enhance transparency, they must be complemented with ongoing empirical validation and red teaming.
-A holistic safety strategy must integrate interpretability with behavioral evaluation and governance oversight.
+Moreover, adopting behavioral cloning from human demonstrations instead of purely RL-based training may also offer a safer alternative, as in such case human preferences would be directly encoded through the data rather than indirectly through reward optimization.
