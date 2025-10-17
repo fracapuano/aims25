@@ -2,24 +2,24 @@
 
 \paragraph{Alignment failure modes}
 Ensuring autonomous systems remain aligned with humans is a paramount challenge in the development of Artificial General Intelligence (AGI)~\citep{goertzelArtificialGeneralIntelligence2014}, which is expected to profoundly transform human life as the first near-peer intelligent entity with which humanity will coexist.
-Technical research in the field of alignment is therefore fundamentally motivated by the need to ensure the generality and agency of (soon-)to-come AGIs benefits humans, avoiding the otherwise catastrophic consequences of autonomous systems endowed with advanced intelligence, agency and power-seeking claims, but fundamentally deprived of well-meaning intentions\footnote{There is limited consensus on the point that intelligent systems might exhibit power-seeking tendencies, with authorities in the field, such as Prof. Yann LeCun, objecting such claims.}.
+Technical research in the field of alignment is therefore fundamentally motivated by the need to ensure the generality and agency of (soon-)to-come AGIs benefits humans, avoiding the otherwise catastrophic consequences of autonomous systems endowed with advanced intelligence, agency and power-seeking traits, while fundamentally deprived of well-meaning intentions\footnote{There is limited consensus on the point that intelligent systems might exhibit power-seeking tendencies, with authorities in the field, such as Prof. Yann LeCun, objecting such claims.}.
 
-Alignment research focuses on mitigating \emph{alignment failures}, which do manifest in multiple distinct but interconnected forms, including reward hacking and goal misgeneralization~\citep{ngoAlignmentProblemDeep2025} scheming and sandbagging~\citep{hubingerRisksLearnedOptimization2021}, and sycophancy~\citep{perezDiscoveringLanguageModel2022}.
-\citet{ngoAlignmentProblemDeep2025} define \emph{reward hacking} to occur whenever an agent exploits flaws of the reward specification provided, which in turn result in the achievement of high rewards without fulfilling the intended objective. 
+In particular, alignment research focuses on mitigating \emph{alignment failures}, which do manifest in multiple distinct but interconnected forms, ranging from reward hacking to goal misgeneralization~\citep{ngoAlignmentProblemDeep2025}, scheming and sandbagging~\citep{hubingerRisksLearnedOptimization2021}, and sycophancy~\citep{perezDiscoveringLanguageModel2022}.
+\citet{ngoAlignmentProblemDeep2025} define \emph{reward hacking} to occur whenever an agent exploits flaws of the reward specification provided, which in turn results in the achievement of high rewards \emph{without} fulfilling the intended objective. 
 In practice, reward hacking plays out as evidently undesirable behaviors at test time, which nonetheless result in \emph{high} reward values, due to reward misspecification.
-Conversely, \emph{goal misgeneralization} arises when, despite proper reward shaping, agents learn alternative, \emph{proxy goals} that aligns with the intended behavior \emph{during training}---i.e., in the \emph{training} distribution---but diverge at test time.
-In practice, this results in large values of reward in training with limited transfer at test time.
+Conversely, \emph{goal misgeneralization} arises when, despite proper reward shaping, agents learn alternative, \emph{proxy-goals} that aligns with the intended behavior \emph{during training}, but that do crucially diverge at test time.
+In practice, this results in large values of reward during training, with limited transfer at test time.
 Crucially,~\citet{ngoAlignmentProblemDeep2025} make the important distinction between \emph{capability misgeneralization}, i.e. poor test-time performance due to \emph{domain gaps}---for instance, due to differen training and testing domains~\citep{tobinDomainRandomizationTransferring2017a}---and goal misgeneralization. 
-Differently from the incompentent performance consequent to capability misgeneralization, \emph{goal misgeneralization} results in satisfactory, goal-oriented performance when tested.
-Still, performance appears suboptimal due to misalignment between the goal followed at test time and the intended objective, which results in another class of alignment failure.
+Differently from the incompentent performance consequent to capability misgeneralization, \emph{goal misgeneralization} does result in satisfactory, goal-oriented performance when tested.
+Nonetheless, performance does also appear suboptimal due to misalignment between the goal followed at test time and the intended objective, resulting in yet another class of alignment failure.
 
-More advanced alignment failures require strategic, situationally-aware planning~\citep{hubingerRisksLearnedOptimization2021}. 
-\emph{Scheming}, for instance, refers to a series of deceptive strategies where an agent plans its actions to appear aligned while fundamentally misaligned.
-In practice, scheming agents display degraded performance during evaluation, while achieving substantially higher performance when operating outside evaluative settings.
-Similarily, \emph{sandbagging} involves deliberately underperforming to manipulate oversight although, differently from scheming, not necessarily displaying full potential outside of evaluation, while \emph{sycophancy} exemplifies the tendency of autonomous systems to provide highly context-dependent outputs based on external, task-independent factors~\citep{perezDiscoveringLanguageModel2022}.
-For instance,~\citet{perezDiscoveringLanguageModel2022} identify sycophantic traits in conversational Large Language Models (LLMs) as the empirical tendency to align to users' stated or implied expectations, even when doing so leads to factually incorrect or logically inconsistent answers.
+More advanced alignment failures such as scheming or sandbagging rely on more strategic, situationally-aware planning capabilities~\citep{hubingerRisksLearnedOptimization2021}.
+\emph{Scheming}, for instance, refers to a series of deceptive strategies where an agent appears aligned while being fundamentally misaligned, which in turn deceives evaluators in their conclusions circa its safety.
+Similarily, \emph{sandbagging} involves deliberately underperforming to manipulate oversight, although, differently from scheming, it does not necessarily do so displaying the full potential outside of evaluation.
+Lastly, \emph{sycophancy} exemplifies the tendency of autonomous systems to provide highly context-dependent outputs based on external, task-independent factors~\citep{perezDiscoveringLanguageModel2022}.
+Specifically,~\citet{perezDiscoveringLanguageModel2022} identify sycophantic traits in conversational Large Language Models (LLMs) as the empirical tendency to align to users' stated or implied expectations, even if doing so results in factually incorrect, or logically inconsistent answers.
 
-This assignment focuses on Goal Misgeneralization (GM), with particular emphasis on Robot Learning~\citep{connellRobotLearning1993a,capuanoRobotLearningTutorial2025}, a field poised to have substantial societal impact as autonomous intelligent systems increasingly operate alongside humans in both digital and physical environments.
+This assignment focuses on Goal Misgeneralization (GM), with particular emphasis on Robot Learning~\citep{connellRobotLearning1993a,capuanoRobotLearningTutorial2025}, a field poised to have substantial societal impact as autonomous intelligent systems increasingly operate alongside humans in both the digital and physical world.
 
 \paragraph{Goal Misgeneralization (GM) in Robot Learning}
 
@@ -30,80 +30,77 @@ This assignment focuses on Goal Misgeneralization (GM), with particular emphasis
     \label{fig:inner-vs-outer}
 \end{figure}
 
-\citet{ngoAlignmentProblemDeep2025} report GM to occur whenever a model internalizes patterns or proxies correlating with the training objective, while failing to capture the essence of it, which ultimately hinders performance at test time.
-In Robot Learning, this problem is particularly salient as autonomous robots relying on Reinforcement Learning (RL) are often trained in simulation~\citep{tobinDomainRandomizationTransferring2017a}, resulting in spurious correlations that may be picked up at training time and therefore induce failure in generalizing to real-world dynamics.
+\citet{ngoAlignmentProblemDeep2025} report GM to occur whenever a model internalizes patterns or proxies correlating with the training objective, while failing to capture its essence, ultimately hindering test-time performance.
+In Robot Learning, this problem is particularly salient as autonomous robots relying on Reinforcement Learning (RL) are often trained in simulation~\citep{tobinDomainRandomizationTransferring2017a}, which results in spurious correlations that may be picked up at training time and therefore induce failure in generalizing to real-world dynamics.
 \emph{A practical example} may be that of a robot trained to \emph{tidy up a room}, a task the Robot Learning community is increasingly referring to as the "Physical Turing Test" (PTT)~\citep{fanPhysicalTuringTest2025}.
 
-In practice, whenever trained in a simulated environment, the robot may learn to identify clutter by pixel patterns unique to simulation rather than the semantic concept of disorder, risking \emph{Capability Misgeneralization} (CM).
-From any room state, the robot can be trained to tidy up by receiving a reward based on visual clues of "tidyness", which could be extracted from raw image observations via a \emph{learned reward-model}.
-Such autonomous robot might associate a "clean environment" (i.e., high-reward) with an absence of disturbances---a valid assumption in simulated environments where it is challenging to inject unpredictable human disturbances rather than one-step noise---and thus optimize for behaviors maintaining such immaculate state.
-When deployed in the real world, human movement in the scene might appear as just another form of disturbance unaccounted for during training.
-If GM was to occur, the robot might decide to block or restrict human entry as a means of keeping the room clean.
+Typically trained in a simulated environment, the robot may learn to identify clutter by pixel patterns unique to simulation rather than the semantic concept of disorder, risking \emph{Capability Misgeneralization} (CM).
+From any room state, the robot can be trained to tidy up by receiving a reward based on visual clues of "tidyness", which could be extracted from raw image observations via a \emph{learned reward models}, which interestingly do introduce a series of high-impact, underexplored challenges in safety research in robot learning, similarily to their impact in LLMs~\citet{christianRewardModelInterpretability2025}.
+Such autonomous robot systems might associate a "clean environment" (i.e., high-reward) with an absence of disturbances---a valid assumption in simulated environments where it is challenging to inject unpredictable human disturbances rather than one-step noise---and thus optimize for behaviors maintaining such immaculate state.
+When deployed in the real world, human movement in the scene might appear as just another form of unaccounted disturbance during training.
+If GM was to occur, the robot might enact actions resulting in blocking or restricting human presence in the room, as a means of having learned the spurious correlation between the absence of disturbances and clean state of the room.
 Such an issue only risks being intensified by the reliance on large-scale, end-to-end learning pipelines which prioritize performance over interpretability, risking catastrophic misalignment.
 
-In the general framework of Inner-vs-Outer alignment~\citep{hubingerRisksLearnedOptimization2021} (Figure~\ref{fig:inner-vs-outer}), GM primarily belongs to the class of inner alignment failures.
-Indeed, GM deals with inner alignment failured due to the outer objective may be well-specified while also misrepresents internally by the agent.
-A robot could be perfectly rewarded for cleaning up but still learn an internal goal such as “remove objects from view,” which only correlates with cleanliness in training conditions.
-This subtle shift in representation makes the problem difficult to detect until the model encounters novel situations.
-It demonstrates that ensuring correct training signals is insufficient when internal generalization fails.
+\paragraph{GM is an Inner Alignment Problem} In the general framework of Inner-vs-Outer alignment~\citep{hubingerRisksLearnedOptimization2021} (Figure~\ref{fig:inner-vs-outer}), GM primarily belongs to the class of inner alignment failures.
+Indeed, GM results from an inner alignment failure, due to the outer objective may be well-specified while being misrepresented internally by the agent.
+In practice, a robot could be perfectly rewarded for cleaning up but still learn an internal goal such as "remove objects from view", which could only correlate with "cleanliness" of the training scenarios.
+This subtle shift in representation makes the problem difficult to detect until the model encounters novel situations, and demonstrates that ensuring correct training signals is insufficient whenever internal generalization fails.
 
 \paragraph{Why Does This Matter in Frontier AI?}
-Robotics is advancing at an unprecedented rate, moving from industrial applications toward domestic and assistive environments.
-Modern systems are increasingly developed through the same pre-training and fine-tuning paradigm detailed in~\citet{ngoAlignmentProblemDeep2025}, with large robotics models are adapted from general intelligence foundations---e.g.,~\citet{abeyruwanGeminiRoboticsBringing2025} is adapted from~\citet{anilGeminiFamilyHighly2025}.
-Such convergence blurs the boundary between cognitive autonomy and physical embodiment, amplifying the risks of misgeneralized objectives through the compounding effects of these two previously distinct domains.
+Robotics is currently advancing at an unprecedented rate, moving from industrial applications toward domestic and assistive environments.
+Modern systems are increasingly developed through the same \emph{pre-training and fine-tuning paradigm} detailed in~\citet{ngoAlignmentProblemDeep2025}, with large robotics models are adapted from general intelligence foundations---e.g.,~\citet{abeyruwanGeminiRoboticsBringing2025} is adapted from~\citet{anilGeminiFamilyHighly2025}.
+Such convergence blurs the boundary between cognitive autonomy and physical embodiment, and amplifies the risks of misgeneralized objectives through the compounding effects of these two previously distinct domains.
 
 \section{Evaluation Design, Monitoring and Robustness}
 
-Assessing GM in autonomous systems requires moving beyond surface-level performance metrics---e.g., cumulative reward or \emph{success rates}---toward interpreting the model's internal representations and causal pathways that connect perception to action.
-In the PTT, this could mean identifying whether the rationale behind the robot's actions originate from \emph{detecting clutter} or by \emph{seeking to preserve a static} environment.
-In practice, this can be implemented using techniques such as GradCAM~\citep{selvarajuGradCAMVisualExplanations2020} for legacy convolutional models, or \emph{circuits} for more modern transformer networks~\citep{elhage2021mathematical}.
-In particular, by analyzing activations corresponding to specific environmental cues, one could infer whether models do represent messiness semantically, or do merely associate it with visual cues correlated albeit not immediately causally-related to disorder---i.e., the presence of a human in a room.
-Being a field in its relatively nascent stage, Robot Learning architectures have not been as thoroughly studied as their LLM counterpart, resulting in challenges related to the identification of circuits developed by models to solve a given task.
-Nonetheless, advancements in research on language models proved the effectiveness of modeling transformers through circuits~\citep{wangInterpretabilityWildCircuit2022}, which ultimately justifies the interest in developing similar techniques in the context of Robot Learning.
+Assessing GM in autonomous systems requires moving beyond surface-level performance metrics---e.g., cumulative reward or \emph{success rates}---toward interpreting the model's internal representations and causal pathways connecting perception to action.
+In the PTT, this could mean identifying whether the rationale behind the robot's actions originates from \emph{detecting clutter} or by \emph{seeking to preserve a static} environment.
+In practice, this connection can be constructed using techniques such as GradCAM~\citep{selvarajuGradCAMVisualExplanations2020} for legacy convolutional models, or \emph{circuits} for more modern transformer networks~\citep{elhage2021mathematical}.
+In particular, by analyzing activations corresponding to specific environmental cues,~\citet{elhage2021mathematical} show how to infer whether models do represent messiness semantically, merely associating it with the visual cues that correlate---albeit not immediately causally-related---to disorder, i.e., the presence of a human in a room.
+
+Being a field in its relatively nascent stage, Robot Learning architectures have not been as thoroughly studied as their LLM counterpart, resulting in challenges related to the identification of said circuits.
+Nonetheless, advancements in research on language models proved the effectiveness of modeling transformers through circuits~\citep{wangInterpretabilityWildCircuit2022}, and ultimately justify interest in developing similar techniques in the context of Robot Learning.
 
 \paragraph{Safety via Interpretability}
-In particular, in the context of interpretability \emph{circuits} denote structured pathways of neuron activations which jointly encode a concept~\citep{elhage2021mathematical}, which in the context of Robot Learning might equate to a behavior.
+In the context of interpretability \emph{circuits} denote structured pathways of activations jointly encoding a concept~\citep{elhage2021mathematical}, which in the context of Robot Learning might equate to a specific fundamental behavior.
 Concretely, circuit discovery in Robot Learning can begin by analyzing video frames paired with internal representations to trace the emergence of task-specific signals.
-Since circuits are rarely studied in embodied systems, this approach would \emph{introduce a way to visualize how goals are operationalized} in Robot Learning policies.
-Discovering such circuits could reveal whether the robot genuinely understands the notion of order or merely associates cleanliness with static visuals.
-This insight would enable more targeted interventions in both training and deployment phases, finding deception features and removing them ensuring the resulting system behaves properly.
-However, such evaluation system could still prove unsufficient to prevent GM due to the intrincacies of finding misaligned directions in the model's activation space for their removal.
-Further, and especially in highly reactive domains like real-world human-robot interactions, interpretability could also result in discovering jail-breaks which could be exploited by attackers whenever the model is not otherwise clearly attackable, underscoring a potentially negative outcome of conducting interpretability research.
+Since circuits are rarely studied in embodied systems, a circuit based approach would introduce a way to \emph{visualize how goals are operationalized} in Robot Learning policies.
+For instance, discovering circuits could reveal whether the robot genuinely understands the notion of order or merely associates cleanliness with static visuals.
+This insight would enable more targeted interventions in both training and deployment phases, finding deception features and removing them to ensure the resulting system behaves in accordance with expectations.
+However, such evaluation system could still prove unsufficient to prevent GM due to the intrincacies related to finding misaligned directions in the model's activation space and.
 
 \paragraph{Monitoring \& Robustness}
-Assessing the current status of autonomous system and its evolution consists in developing interpretability-based evaluations that can truly capture the internal processes underpinning the performance of autonomous systems.
+Assessing the current status of autonomous system and its evolution revolves around developing interpretability-based evaluations that can truly capture the internal processes underpinning the performance of autonomous systems.
 In the context of GM in Robot Learning, continuous monitoring can involve periodically probing the model's learned representations throughout training, verifying that its internal objectives remain aligned with external reward structures. 
-Further, techniques such as activations \emph{patching}~\citep{elhage2021mathematical} and \emph{probing}~\citep{belinkovProbingClassifiersPromises2021} can also reveal whether the circuits responsible for task execution retain stable, causal meaning or, problematically, drift toward spurious correlations.
-\emph{Red teaming}---either human~\citep{fefferRedTeamingGenerativeAI2024} or AI-based~\citep{majumdarRedTeamingAI2025}---does also offers an important, complementary strategy for robustness.
-By deliberately designing adversarial environments or synthetic disturbances that challenge the model's learned assumptions, model developers can stress-test whether the robot maintains intended behavior under distributional shifts.
-For instance, introducing new forms of "mess" or dynamic human movement unseen during training can reveal whether the robot generalizes the goal of tidiness or merely preserves a static environment.
+Further, techniques such as activations \emph{patching}~\citep{elhage2021mathematical} and \emph{probing}~\citep{belinkovProbingClassifiersPromises2021} can also reveal whether the circuits responsible for task execution retain stable, causal meaning or, more problematically, drift toward low performance induced by picking up on spurious correlations.
+\emph{Red teaming}---either human~\citep{fefferRedTeamingGenerativeAI2024} or AI-based~\citep{majumdarRedTeamingAI2025}---does also offer an important, complementary strategy to ensure robustness.
+By deliberately designing adversarial environments or synthetic disturbances that challenge the model's learned assumptions, groups of model developers could stress-test whether the robot maintains intended behavior under targeted distributional shifts, bulding convinction towards the robustness of the algorithm considered.
 
-Lastly, combining monitoring with adversarial testing provides a dual safeguard, as \emph{interpretability assesses the inner workings of a model}, while \emph{red-teaming verifies whether those goals remain safe and stable} across deployment scenarios.
-In practice, robustness could be improved by incorporating \emph{online} monitoring probes that run concurrently with the robot control system at eval and test-time, resulting in a high-level \emph{semantic stop-button}, completing the red-teaming efforts made while evaluating work, which could also ensure that deviations from intended behavior and can be detected early, so to correct or abort unsafe actions.
+Combining monitoring with adversarial testing provides a dual safeguard, as \emph{interpretability assesses the inner workings of a model}, while \emph{red-teaming verifies whether those goals remain safe and stable} across deployment scenarios.
+In practice, robustness could also be improved by incorporating \emph{online} monitoring \emph{probes} that run concurrently with the robot control system at eval and test-time, resulting in a high-level \emph{semantic stop-button}, complementing red-teaming efforts while evaluating work deviating from the difference in intended behaviors that can be detected in order to correct or abort unsafe actions.
 
 \paragraph{Limitations}
-Clearly, interpretability techniques such as circuits cannot be considered a universal solution to alignment failures by themselves.
-While they offer valuable insights into the model internals, complex behaviors which may violate the \emph{Linear Representation Hypothesis}~\citep{parkLinearRepresentationHypothesis2024} may defy traditional interpretability efforts.
-Additionally, interpretability constraints might reduce performance or introduce new forms of gaming and misuse by exposing possible adversarial routes  to mimic interpretable structures without genuine understanding.
-Thus, while circuits enhance transparency, their practical performance might improve if complemented with ongoing empirical validation and red teaming.
-Ideally, the practical implemenetation of autonomous systems in the real-world would be based on a holistic safety strategy integrating interpretability, challenging behavioral evaluation all with rigorous governance oversight to ensure safety standards are met.
+While circuits offer valuable insights into the model internals, complex behaviors which may violate the \emph{Linear Representation Hypothesis}~\citep{parkLinearRepresentationHypothesis2024} may defy traditional interpretability assumptions.
+Additionally, interpretability constraints might even highlight forms of gaming and misuse, by exposing possible adversarial routes mimicking interpretable structures without genuine understanding.
+Thus, while circuits enhance transparency, their practical performance might improve when complemented with ongoing empirical validation and red teaming.
+Ideally, the practical implementation of autonomous systems in real-world scenarios should be based on a holistic safety strategy integrating interpretability, challenging behavioral evaluation, as well as rigorous governance oversight to ensure safety standards are met before and after advanced robot technologies enter society.
 
 \section{Governance and Policy}
-Just like the aviation and automotive industries, it is reasonable to expect the robotics industry to face regulatory scrutiny, ensuring robots met security standards both before and while being integrated into society.
-Indeed, unlike purely digital systems, embodied AI operates in physical spaces that are shared with humans, so that failures can cause direct physical harm.
-Therefore, given their tangible risks and similarity with automotive and aviation precedents, it is rational to expect governmental institutions to seek clear jurisdiction, developing incentives to impose strict safety standards said systems, which could be enforced in practice by establishing comprehensive evaluation and interpretability requirements as a prerequisite for certification.
+Just like the aviation and automotive industries, it is reasonable to expect the robotics industry to face regulatory scrutiny aiming at ensuring robots met security standards both \emph{before} and \emph{while} being integrated into society.
+Indeed, unlike purely digital systems, embodied AI operates in physical spaces that are shared with humans, so that failures can cause limited direct physical harm.
+Therefore, given their tangible risks and similarity with automotive and aviation precedents, it is rational to expect governmental institutions to leverage national jurisdiction to develop incentives for developers to adhere to strict safety standards, which could be enforced in practice by establishing comprehensive evaluation and interpretability requirements as a prerequisite for certification.
 
 \paragraph{ICAO-like Governance for Decentralized and Unbalanced AI Regulation}
-The \emph{highly interconnected and international nature} of developments in the field of AI poses severe challenges to the power of any single country to regulate this technology. 
-Further, industry players' outsized influence in developing Frontier AI technologies poses severe \emph{risks to the sovereignity of individual nation states}, resulting in further governance challenges in addressing general AI development in an internationally non-coordinated manner.
-A possible solution to this challenge would be the development of governance structures for (physical-) AI systems inspired from international regulatory bodies such as the International Civil Aviation Organization (ICAO), which harmonizes safety standards, certification procedures, and operational oversight \emph{across} nations.
+The \emph{highly interconnected and international nature} of developments in the field of AI poses severe challenges to any single country in its ability to regulate such technology.
+Further, industry players' outsized influence in developing Frontier AI as part of a broader set of technologies permeating everyday-life does also pose severe \emph{risks to the sovereignity of individual nation states} in addressing this matter, all of which resulting in clear governance challenges in addressing general AI development in an \emph{internationally, non-coordinated} manner.
+A possible solution to this challenge would be the development of governance structures for (physical-) AI systems inspired from \emph{international} regulatory bodies such as the International Civil Aviation Organization (ICAO), which harmonizes safety standards, certification procedures, and operational oversight \emph{across} nations.
 
-A comparable framework for rolling out robot learning in practice could consist on shared safety benchmarks, as well as standardized interpretability requirements and transparent reporting protocols among manufacturers and research labs. 
-Such an international alignment body could facilitate responsible scaling by ensuring that safety evaluations, including interpretability audits or robustness benchmarks, are conducted and validated under unified global standards, rather than fragmented national guidelines.
-This approach could foster cross-border accountability and mitigate the risk of a regulatory "race to the bottom", where looser jurisdictions attract unsafe or opaque deployments, by enforcing regulatory standards through the \emph{positive externalities} of agreeing on specific standards.
-Critically, differently from more established sectors like aviation, definitive inspections of models internals are rarely feasible at the present time, due the (currently) \emph{fundamentally uninterpretable} nature of autonomous systems, whose internal logic cannot be easily dissected, exhaustively verified and thus audited.
-As a result of this fundamental regulatory limitation, oversight agencies might face fundamental uncertainties about the completeness and reliability of interpretability assessments, making post-certification monitoring and dynamic evaluation a critical complement to static regulation.
+A comparable framework for rolling out robot learning in practice could consist on \emph{shared safety benchmarks}, as well as \emph{standardized interpretability requirements} and transparent reporting protocols among autonomous systems developers.
+Such an international alignment body could facilitate responsible scaling by ensuring that safety evaluations---including interpretability audits or robustness benchmarks---are conducted and validated under unified global standards, rather than fragmented national guidelines.
+This approach could foster cross-border accountability and mitigate the risk of a regulatory "race to the bottom", where looser jurisdictions attract unsafe or opaque deployments, by enforcing regulatory standards through the \emph{positive network externalities} of agreeing on shared standards.
+Critically, however, in contrast to sectors like aviation, definitive inspections of models internals are rarely feasible at the present time, due the (currently) \emph{fundamentally uninterpretable} nature of autonomous systems, whose internal logic cannot be easily dissected, exhaustively verified and thus audited.
+As a result of this fundamental technical limitation, it is reasonable to expect oversight agencies might face fundamental uncertainties about the completeness and reliability of interpretability assessments, making post-certification monitoring and dynamic evaluation a critical complement to static regulation.
 
-Considering the practical example of house robots, regulators could mandate interpretability as a crucial safety guarantee, requiring that deployed robots possess \emph{demonstrable circuits} corresponding to key behavioral goals.
-By enforcing visibility into how decisions are made, authorities can reduce the likelihood of undetected goal misgeneralization.
-Moreover, adopting behavioral cloning from human demonstrations instead of purely RL-based training may also offer a safer alternative, as in such case human preferences would be directly encoded through the data rather than indirectly through reward optimization.
+Considering the practical example of house robots, regulators could mandate interpretability as a crucial safety guarantee, requiring that deployed robots operate leveraging \emph{demonstrable circuits} corresponding to key behavioral goals.
+By enforcing visibility into how decisions are made, authorities can reduce the likelihood of undetected GM.
+On a more technical note, mandating the adoption of behavioral cloning from human demonstrations instead of purely RL-based training may also offer a safeguard, as in such case human preferences would be directly \emph{encoded through the demonstration data itself} rather than indirectly through reward optimization.
