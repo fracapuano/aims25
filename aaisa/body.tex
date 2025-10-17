@@ -19,7 +19,7 @@ In practice, scheming agents display degraded performance during evaluation, whi
 Similarily, \emph{sandbagging} involves deliberately underperforming to manipulate oversight although, differently from scheming, not necessarily displaying full potential outside of evaluation, while \emph{sycophancy} exemplifies the tendency of autonomous systems to provide highly context-dependent outputs based on external, task-independent factors~\citep{perezDiscoveringLanguageModel2022}.
 For instance,~\citet{perezDiscoveringLanguageModel2022} identify sycophantic traits in conversational Large Language Models (LLMs) as the empirical tendency to align to users' stated or implied expectations, even when doing so leads to factually incorrect or logically inconsistent answers.
 
-This assignment focuses on Goal Misgeneralization (GM), with particular emphasis on robot learning~\citep{connellRobotLearning1993a,capuanoRobotLearningTutorial2025}, a field poised to have substantial societal impact as autonomous intelligent systems increasingly operate alongside humans in both digital and physical environments.
+This assignment focuses on Goal Misgeneralization (GM), with particular emphasis on Robot Learning~\citep{connellRobotLearning1993a,capuanoRobotLearningTutorial2025}, a field poised to have substantial societal impact as autonomous intelligent systems increasingly operate alongside humans in both digital and physical environments.
 
 \paragraph{Goal Misgeneralization (GM) in Robot Learning}
 
@@ -52,21 +52,41 @@ Robotics is advancing at an unprecedented rate, moving from industrial applicati
 Modern systems are increasingly developed through the same pre-training and fine-tuning paradigm detailed in~\citet{ngoAlignmentProblemDeep2025}, with large robotics models are adapted from general intelligence foundations---e.g.,~\citet{abeyruwanGeminiRoboticsBringing2025} is adapted from~\citet{anilGeminiFamilyHighly2025}.
 Such convergence blurs the boundary between cognitive autonomy and physical embodiment, amplifying the risks of misgeneralized objectives through the compounding effects of these two previously distinct domains.
 
-\section{Evaluation Design}
+\section{Evaluation Design, Monitoring and Robustness}
 
-\paragraph{Interpretability}
-Evaluating goal misgeneralization requires moving beyond surface-level metrics to interpret the model’s internal reasoning.
-In the context of robot learning, this means identifying whether the robot cleans because it detects clutter or because it seeks to preserve a static environment.
-By probing activations corresponding to environmental cues, researchers can infer whether a model represents “messiness” semantically or merely associates it with visual noise.
-Developing interpretability tools to track causal circuits of perception and action allows verification that the robot’s policy aligns with intended goals.
-This step is critical for diagnosing reward hacking behaviors that stem from proxy-based reasoning.
+Assessing GM in autonomous systems requires moving beyond surface-level performance metrics---e.g., cumulative reward or \emph{success rates}---toward interpreting the model's internal representations and causal pathways that connect perception to action.
+In the PTT, this could mean identifying whether the rationale behind the robot's actions originate from \emph{detecting clutter} or by \emph{seeking to preserve a static} environment.
+In practice, this can be implemented using techniques such as GradCAM~\citep{selvarajuGradCAMVisualExplanations2020} for legacy convolutional models, or \emph{circuits} for more modern transformer networks~\citep{elhage2021mathematical}.
+In particular, by analyzing activations corresponding to specific environmental cues, one could infer whether models do represent messiness semantically, or do merely associate it with visual cues correlated albeit not immediately causally-related to disorder---i.e., the presence of a human in a room.
+Being a field in its relatively nascent stage, Robot Learning architectures have not been as thoroughly studied as their LLM counterpart, resulting in challenges related to the identification of circuits developed by models to solve a given task.
+Nonetheless, advancements in research on language models proved the effectiveness of modeling transformers through circuits~\citep{wangInterpretabilityWildCircuit2022}, which ultimately justifies the interest in developing similar techniques in the context of Robot Learning.
 
-\paragraph{A Proposal: Discovering Circuits starting from frames}
-A circuit, in interpretability research, denotes a structured pathway of neuron activations that jointly encode a concept or behavior.
-In robot learning, circuit discovery can begin by analyzing video frames paired with internal representations to trace the emergence of task-specific signals.
-Since circuits are rarely studied in embodied systems, this approach introduces a way to visualize how goals are operationalized in sensory-motor policies.
+\paragraph{Safety via Interpretability}
+In particular, in the context of interpretability \emph{circuits} denote structured pathways of neuron activations which jointly encode a concept~\citep{elhage2021mathematical}, which in the context of Robot Learning might equate to a behavior.
+Concretely, circuit discovery in Robot Learning can begin by analyzing video frames paired with internal representations to trace the emergence of task-specific signals.
+Since circuits are rarely studied in embodied systems, this approach would \emph{introduce a way to visualize how goals are operationalized} in Robot Learning policies.
 Discovering such circuits could reveal whether the robot genuinely understands the notion of order or merely associates cleanliness with static visuals.
-This insight would enable more targeted interventions in both training and deployment phases.
+This insight would enable more targeted interventions in both training and deployment phases, finding deception features and removing them ensuring the resulting system behaves properly.
+However, such evaluation system could still prove unsufficient to prevent GM due to the intrincacies of finding misaligned directions in the model's activation space for their removal.
+Further, and especially in highly reactive domains like real-world human-robot interactions, interpretability could also result in discovering jail-breaks which could be exploited by attackers whenever the model is not otherwise clearly attackable, underscoring a potentially negative outcome of conducting interpretability research.
+
+\paragraph{Monitoring \& Robustness}
+Assessing the current status of autonomous system and its evolution consists in developing interpretability-based evaluations that can truly capture the internal processes underpinning the performance of autonomous systems.
+In the context of GM in Robot Learning, continuous monitoring can involve periodically probing the model's learned representations throughout training, verifying that its internal objectives remain aligned with external reward structures. 
+Further, techniques such as activations \emph{patching}~\citep{elhage2021mathematical} and \emph{probing}~\citep{belinkovProbingClassifiersPromises2021} can also reveal whether the circuits responsible for task execution retain stable, causal meaning or, problematically, drift toward spurious correlations.
+\emph{Red teaming}---either human~\citep{fefferRedTeamingGenerativeAI2024} or AI-based~\citep{majumdarRedTeamingAI2025}---does also offers an important, complementary strategy for robustness.
+By deliberately designing adversarial environments or synthetic disturbances that challenge the model's learned assumptions, model developers can stress-test whether the robot maintains intended behavior under distributional shifts.
+For instance, introducing new forms of "mess" or dynamic human movement unseen during training can reveal whether the robot generalizes the goal of tidiness or merely preserves a static environment.
+
+Lastly, combining monitoring with adversarial testing provides a dual safeguard, as \emph{interpretability assesses the inner workings of a model}, while \emph{red-teaming verifies whether those goals remain safe and stable} across deployment scenarios.
+In practice, robustness could be improved by incorporating \emph{online} monitoring probes that run concurrently with the robot control system at eval and test-time, resulting in a high-level \emph{semantic stop-button}, completing the red-teaming efforts made while evaluating work, which could also ensure that deviations from intended behavior and can be detected early, so to correct or abort unsafe actions.
+
+\paragraph{Limitations}
+Clearly, interpretability techniques such as circuits cannot be considered a universal solution to alignment failures by themselves.
+While they offer valuable insights into the model internals, complex behaviors which may violate the \emph{Linear Representation Hypothesis}~\citep{parkLinearRepresentationHypothesis2024} may defy traditional interpretability efforts.
+Additionally, interpretability constraints might reduce performance or introduce new forms of gaming and misuse by exposing possible adversarial routes  to mimic interpretable structures without genuine understanding.
+Thus, while circuits enhance transparency, their practical performance might improve if complemented with ongoing empirical validation and red teaming.
+Ideally, the practical implemenetation of autonomous systems in the real-world would be based on a holistic safety strategy integrating interpretability, challenging behavioral evaluation all with rigorous governance oversight to ensure safety standards are met.
 
 \section{Governance and Policy}
 
