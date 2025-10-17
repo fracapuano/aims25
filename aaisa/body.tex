@@ -1,65 +1,91 @@
 \section{Problem Definition}
 
 \paragraph{Alignment failure modes}
-% The 5 failure modes of alignment, in brief. Reward Hacking, Goal Misgeneralization, Scheming, Sandbagging, Sycophancy
+Ensuring autonomous systems remain aligned with humans is a paramount challenge in the development of Artificial General Intelligence (AGI)~\citep{goertzelArtificialGeneralIntelligence2014}, which is expected to profoundly transform human life as the first near-peer intelligent entity with which humanity will coexist.
+Technical research in the field of alignment is therefore fundamentally motivated by the need to ensure the generality and agency of (soon-)to-come AGIs benefits humans, avoiding the otherwise catastrophic consequences of autonomous systems endowed with advanced intelligence, agency and power-seeking claims, but fundamentally deprived of well-meaning intentions\footnote{There is limited consensus on the point that intelligent systems might exhibit power-seeking tendencies, with authorities in the field, such as Prof. Yann LeCun, objecting such claims.}.
 
-\paragraph{Goal Misgeneralization in Robot Learning}
-% Goal misgeneralization deep dive. What is it, focus on spurious correlation
+Alignment research focuses on mitigating \emph{alignment failures}, which do manifest in multiple distinct but interconnected forms, including reward hacking and goal misgeneralization~\citep{ngoAlignmentProblemDeep2025} scheming and sandbagging~\citep{hubingerRisksLearnedOptimization2021}, and sycophancy~\citep{perezDiscoveringLanguageModel2022}.
+\citet{ngoAlignmentProblemDeep2025} define \emph{reward hacking} to occur whenever an agent exploits flaws of the reward specification provided, which in turn result in the achievement of high rewards without fulfilling the intended objective. 
+In practice, reward hacking plays out as evidently undesirable behaviors at test time, which nonetheless result in \emph{high} reward values, due to reward misspecification.
+Conversely, \emph{goal misgeneralization} arises when, despite proper reward shaping, agents learn alternative, \emph{proxy goals} that aligns with the intended behavior \emph{during training}---i.e., in the \emph{training} distribution---but diverge at test time.
+In practice, this results in large values of reward in training with limited transfer at test time.
+Crucially,~\citet{ngoAlignmentProblemDeep2025} make the important distinction between \emph{capability misgeneralization}, i.e. poor test-time performance due to \emph{domain gaps}---for instance, due to differen training and testing domains~\citep{tobinDomainRandomizationTransferring2017a}---and goal misgeneralization. 
+Differently from the incompentent performance consequent to capability misgeneralization, \emph{goal misgeneralization} results in satisfactory, goal-oriented performance when tested.
+Still, performance appears suboptimal due to misalignment between the goal followed at test time and the intended objective, which results in another class of alignment failure.
 
-% In robot learning it is particularly pressing because of Sim2Real approach
+More advanced alignment failures require strategic, situationally-aware planning~\citep{hubingerRisksLearnedOptimization2021}. 
+\emph{Scheming}, for instance, refers to a series of deceptive strategies where an agent plans its actions to appear aligned while fundamentally misaligned.
+In practice, scheming agents display degraded performance during evaluation, while achieving substantially higher performance when operating outside evaluative settings.
+Similarily, \emph{sandbagging} involves deliberately underperforming to manipulate oversight although, differently from scheming, not necessarily displaying full potential outside of evaluation, while \emph{sycophancy} exemplifies the tendency of autonomous systems to provide highly context-dependent outputs based on external, task-independent factors~\citep{perezDiscoveringLanguageModel2022}.
+For instance,~\citet{perezDiscoveringLanguageModel2022} identify sycophantic traits in conversational Large Language Models (LLMs) as the empirical tendency to align to users' stated or implied expectations, even when doing so leads to factually incorrect or logically inconsistent answers.
 
-\paragraph{Goal Misgeneralization in the Inner vs. Outer Alignment Framework}
+This assignment focuses on Goal Misgeneralization (GM), with particular emphasis on robot learning~\citep{connellRobotLearning1993a,capuanoRobotLearningTutorial2025}, a field poised to have substantial societal impact as autonomous intelligent systems increasingly operate alongside humans in both digital and physical environments.
 
-% Situate GM in the context of inner outer alignment
+\paragraph{Goal Misgeneralization (GM) in Robot Learning}
 
-% Argue for why it is an inner alignment problem, explaining why is not an outer problem
+\begin{figure}
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/inner-vs-outer-alignment.png}
+    \caption{A visualization of the Outer vs. Inner alignment framework. The two different types of misalignment can incur whenever an agent is trained to reach an objective that is misaligned with respect to the overarching human intent on one of two planes: the plane of reward-encoded preferences (Outer Misalignment), or the plane of the reward function-maximizers (Inner Misalignment).}
+    \label{fig:inner-vs-outer}
+\end{figure}
 
-\paragraph{An Example: Tidying Up by Preventing Access}
+\citet{ngoAlignmentProblemDeep2025} report GM to occur whenever a model internalizes patterns or proxies correlating with the training objective, while failing to capture the essence of it, which ultimately hinders performance at test time.
+In Robot Learning, this problem is particularly salient as autonomous robots relying on Reinforcement Learning (RL) are often trained in simulation~\citep{tobinDomainRandomizationTransferring2017a}, resulting in spurious correlations that may be picked up at training time and therefore induce failure in generalizing to real-world dynamics.
+\emph{A practical example} may be that of a robot trained to \emph{tidy up a room}, a task the Robot Learning community is increasingly referring to as the "Physical Turing Test" (PTT)~\citep{fanPhysicalTuringTest2025}.
 
-% Physical turing Test as per Jim Fan's argument
+In practice, whenever trained in a simulated environment, the robot may learn to identify clutter by pixel patterns unique to simulation rather than the semantic concept of disorder, risking \emph{Capability Misgeneralization} (CM).
+From any room state, the robot can be trained to tidy up by receiving a reward based on visual clues of "tidyness", which could be extracted from raw image observations via a \emph{learned reward-model}.
+Such autonomous robot might associate a "clean environment" (i.e., high-reward) with an absence of disturbances---a valid assumption in simulated environments where it is challenging to inject unpredictable human disturbances rather than one-step noise---and thus optimize for behaviors maintaining such immaculate state.
+When deployed in the real world, human movement in the scene might appear as just another form of disturbance unaccounted for during training.
+If GM was to occur, the robot might decide to block or restrict human entry as a means of keeping the room clean.
+Such an issue only risks being intensified by the reliance on large-scale, end-to-end learning pipelines which prioritize performance over interpretability, risking catastrophic misalignment.
 
-% Present an example where the goal depends on not registering presence of humans in an environment
-
-% At train time, in simulation, no external disturbance besides the mess up is presented
-
-% At test time, whenever humans walk in that is read as a disturbance
-
-% That can be read as something to remove if GM was to occurr, resulting in a failure
+In the general framework of Inner-vs-Outer alignment~\citep{hubingerRisksLearnedOptimization2021} (Figure~\ref{fig:inner-vs-outer}), GM primarily belongs to the class of inner alignment failures.
+Indeed, GM deals with inner alignment failured due to the outer objective may be well-specified while also misrepresents internally by the agent.
+A robot could be perfectly rewarded for cleaning up but still learn an internal goal such as “remove objects from view,” which only correlates with cleanliness in training conditions.
+This subtle shift in representation makes the problem difficult to detect until the model encounters novel situations.
+It demonstrates that ensuring correct training signals is insufficient when internal generalization fails.
 
 \paragraph{Why Does This Matter in Frontier AI?}
-
-% Robotics is advancing at an unprecendented rate
-
-% Robots will be coming into the home. Further, they are increasingly developed in accordance to the pre-training/fine-tuning paradigm
-
-% Gemini Robotics directly uses the weights of Gemini, so the boundary between Digital and Physical AI are also blurring
+Robotics is advancing at an unprecedented rate, moving from industrial applications toward domestic and assistive environments.
+Modern systems are increasingly developed through the same pre-training and fine-tuning paradigm detailed in~\citet{ngoAlignmentProblemDeep2025}, with large robotics models are adapted from general intelligence foundations---e.g.,~\citet{abeyruwanGeminiRoboticsBringing2025} is adapted from~\citet{anilGeminiFamilyHighly2025}.
+Such convergence blurs the boundary between cognitive autonomy and physical embodiment, amplifying the risks of misgeneralized objectives through the compounding effects of these two previously distinct domains.
 
 \section{Evaluation Design}
 
-% How can you measure whether GM is occurring, besides practical rollouts during training
-
 \paragraph{Interpretability}
-
-% Develop a circuit to understand if the room is being cleared because mess is already present or if it is clean by keeping it clean
+Evaluating goal misgeneralization requires moving beyond surface-level metrics to interpret the model’s internal reasoning.
+In the context of robot learning, this means identifying whether the robot cleans because it detects clutter or because it seeks to preserve a static environment.
+By probing activations corresponding to environmental cues, researchers can infer whether a model represents “messiness” semantically or merely associates it with visual noise.
+Developing interpretability tools to track causal circuits of perception and action allows verification that the robot’s policy aligns with intended goals.
+This step is critical for diagnosing reward hacking behaviors that stem from proxy-based reasoning.
 
 \paragraph{A Proposal: Discovering Circuits starting from frames}
-
-% What is a circuit in the context of interpretability
-
-% Circuits in robot learning are not common at all
+A circuit, in interpretability research, denotes a structured pathway of neuron activations that jointly encode a concept or behavior.
+In robot learning, circuit discovery can begin by analyzing video frames paired with internal representations to trace the emergence of task-specific signals.
+Since circuits are rarely studied in embodied systems, this approach introduces a way to visualize how goals are operationalized in sensory-motor policies.
+Discovering such circuits could reveal whether the robot genuinely understands the notion of order or merely associates cleanliness with static visuals.
+This insight would enable more targeted interventions in both training and deployment phases.
 
 \section{Governance and Policy}
 
-% like airplanes and cars, physical robots will have to undergo scrutinuous regulation before being rolled out to the general public
-
-% governments have a much more direct way of stepping in that with purely digital systems, which derives from the higher risks associated with physical AIs
+Physical robots, like airplanes and cars, will inevitably face rigorous regulatory scrutiny before being integrated into society.
+Unlike purely digital systems, embodied AI operates in shared physical spaces, where failures can cause direct harm.
+Governments have clearer jurisdiction and stronger incentives to impose strict safety standards on such systems, given their tangible risks.
+Establishing comprehensive evaluation and interpretability requirements could become a prerequisite for certification.
+This framework parallels historical precedents in aviation and automotive safety, where testing and transparency became central to public trust.
 
 \paragraph{Regulating by Guaranteeing Interpretable Outcomes}
-
-% Enforcing interpretability and the presence of some circuits might reduce this risk
-
-% Also, using Behavioral Cloning instead of Sim2Real RL might also be a solution because of the fact preferences are directly encoded in the demonstrations
+Regulators could mandate interpretability as a safety guarantee, requiring that deployed robots possess demonstrable circuits corresponding to key behavioral goals.
+By enforcing visibility into how decisions are made, authorities can reduce the likelihood of undetected goal misgeneralization.
+Moreover, adopting behavioral cloning from human demonstrations instead of purely reinforcement-based learning may offer a safer alternative.
+In such setups, human preferences are encoded directly through data rather than indirectly through reward optimization.
+This approach prioritizes alignment with human intent by design rather than through post hoc correction.
 
 \subsection{Limitations}
-% specify that circuits cannot be considered the silver bullet in general
-
+Circuits cannot be considered a universal solution to alignment failures.
+While they offer valuable insights into model reasoning, complex behaviors may emerge from distributed representations that defy simple mechanistic interpretation.
+Additionally, interpretability constraints might reduce performance or introduce new forms of gaming if models learn to mimic interpretable structures without genuine understanding.
+Thus, while circuits enhance transparency, they must be complemented with ongoing empirical validation and red teaming.
+A holistic safety strategy must integrate interpretability with behavioral evaluation and governance oversight.
