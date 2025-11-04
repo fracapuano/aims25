@@ -157,5 +157,189 @@ This results in:
 \paragraph{(c) Linear programming formulation.}
 Given in (a).
 
+\section{Duality}
+
+\subsection*{1. Projection onto the $\ell_1$-ball}
+\begin{align}\label{eq:projection-onto-l1}
+\min_{x}\ \tfrac12\|x-a\|_2^2\quad\text{s.t.}\quad \|x\|_1\le c.
+\end{align}
+
+\paragraph{(a) Derive the dual}
+
+The dual problem to~\ref{eq:projection-onto-l1} can be defined starting from the Lagrangian function associated with the problem, \( \mathcal L (x,\lambda) = f(x) + \lambda g(x) \), for problems written in standard form (i.e., using only \( g(x) \leq 0 \) and \(h(x) = 0 \) constraints.
+
+In this particular case, the Lagrangian function is:
+\begin{equation}
+    \mathcal L (x, \lambda) = \frac12 \|x-a\|_2^2  + \lambda(\| x \|_1 - c),
+\end{equation}
+which can be rewritten in terms of the individual \( x_i \) variables, yielding
+\begin{equation}
+    \mathcal L (x, \lambda) = \sum_{i=1}^n \bigg( \underbrace{\frac12(x_i-a_i)^2  + \lambda \vert x_i \vert}_{l_i(x, \lambda)} \bigg) - \lambda c.
+\end{equation}
+
+Therefore, obtaining the dual function \( g(\lambda) = \inf_x \mathcal L(x,\lambda) \) corresponds to minimizing  each individual \( l_i(x, \lambda) \), resulting in:
+\begin{equation}
+\frac{\partial l_i(x,\lambda)}{\delta x} = x_i - a_i + \lambda \operatorname{sign}(x_i) = 0 \Longleftrightarrow %
+\begin{cases}
+x_i = a_i - \lambda, \, x_i> 0 \\
+x_i = a_i + \lambda, \, x_i< 0
+\end{cases},
+\end{equation}
+
+implying:
+\begin{equation}
+g(\lambda) = 
+\begin{cases}
+\tfrac12 \lambda^2 + a_i - \lambda, \, & \lambda < a_i \\
+\tfrac12 \lambda^2 - a_i - \lambda, \, & \lambda > a_i \\
+\end{cases}
+\end{equation}
+With the dual problem being $\max_{\lambda \ge 0} g(\lambda)$.
+
+\paragraph{(b) Retrieving \( x^* \) from \( \lambda^*\)}
+One can use the KKT conditions to obtain the primal solution \( x^* \) straight from \( \lambda ^* \), and in particular use the KKT conditions as a set of conditions to be solved for \( x^* \) given the optimal dual \( \lambda^* \).
+In particular,
+\begin{equation}
+\text{KKT}: 
+\begin{cases}
+0 \in x^* - a + \lambda^* \,\partial\|x\|_1 & \text{(stationarity, with sub-gradients)} \\
+\|x\|_1 \le c & \text{(primal feasibility)} \\
+\lambda \ge 0 & \text{(dual feasibility)} \\
+\lambda(\|x\|_1 - c) = 0 & \text{(complementary slackness)}
+\end{cases}
+\end{equation}
+
+\subsection*{2. SVM duality}
+
+\paragraph{(a) SVM as a QP}
+Given training data $\{(\mathbf{x}_i, y_i)\}_{i=1}^n$ with $\mathbf{x}_i \in \mathbb{R}^d$ and $y_i \in \{-1, +1\}$, 
+the hard-margin SVM primal problem is:
+
+\begin{equation}
+\begin{aligned}
+\min_{\mathbf{w},\, b} \quad & \frac{1}{2}\|\mathbf{w}\|_2^2 \\
+\text{s.t.} \quad & y_i(\mathbf{w}^\top \mathbf{x}_i - b) \ge 1, 
+\quad i = 1, \ldots, n.
+\end{aligned}
+\end{equation}
+
+We seek to represent this problem as a Quadratic Problem (QP) of the type:
+\[
+\begin{aligned}
+\min_{\mathbf{z}\in\mathbb{R}^{d+1}} \quad & \tfrac12\,\mathbf{z}^\top Q\,\mathbf{z} + c^\top \mathbf{z} \\[2pt]
+\text{s.t.}\quad & A\,\mathbf{z} \le \mathbf{b},
+\end{aligned}
+\]
+
+Let us start by stacking both \( \mathbf{w} \) and \( b \) variables, which results into:
+\[
+\mathbf{z} \;=\;
+\begin{bmatrix}
+\mathbf{w}\\[2pt] b
+\end{bmatrix}
+\in\mathbb{R}^{d+1}.
+\]
+
+Only $\mathbf{w}$ is penalized, hence
+\[
+\frac12\,\mathbf{z}^\top
+\underbrace{\begin{bmatrix}
+I_d & 0\\
+0 & 0
+\end{bmatrix}}_{Q}
+\mathbf{z}
+\;+\;
+\underbrace{\mathbf{0}^\top}_{c^\top}\mathbf{z}.
+\]
+
+
+Each margin constraint is
+\[
+y_i(\mathbf{w}^\top \mathbf{x}_i - b)\ \ge\ 1
+\ \Longleftrightarrow\
+-\,y_i\,\mathbf{x}_i^\top\,\mathbf{w} \;+\; y_i\,b \;\le\; -1.
+\]
+Representing all the $n$ inequality constraints in matrix form:
+\[
+A\,\mathbf{z}\ \le\ \mathbf{b},
+\]
+one obtains 
+\[
+A \;=\;
+\begin{bmatrix}
+\begin{array}{c|c}
+- y_1 \mathbf{x}_1^\top & y_1\\
+\vdots & \vdots\\
+- y_n \mathbf{x}_n^\top & y_n
+\end{array}
+\end{bmatrix}
+\ =\
+\big[\, -\operatorname{diag}(\mathbf{y})\,X \ \big|\ \mathbf{y} \,\big]
+\in\mathbb{R}^{n\times(d+1)},
+\qquad
+\mathbf{b} \;=\; -\mathbf{1}\in\mathbb{R}^n,
+\]
+resulting in a QP problem with:
+\[
+Q=\begin{bmatrix} I_d & 0\\ 0 & 0 \end{bmatrix},
+\quad
+c=\mathbf{0},
+\quad
+A=\big[\, -\operatorname{diag}(\mathbf{y})\,X \ \big|\ \mathbf{y} \,\big],
+\quad
+\mathbf{b}=-\mathbf{1}.
+\]
+
+
+\paragraph{(b) Dual of the QP formulation.}
+
+Here, $\mathbf{Q} \in \mathbb{R}^{n \times n}$ is a symmetric, positive semi-definite matrix by construction ($\text{null}(\mathbf{Q}) \neq \{0\}$), $A \in \mathbb{R}^{m \times n}$, $\mathbf{b} \in \mathbb{R}^m$, and $c \in \mathbb{R}^n$.
+
+Introducing a vector of non-negative Lagrange multipliers (dual variables) $\lambda \in \mathbb{R}^m$ the Lagrangian function is:
+
+$$\mathcal L (\mathbf{z}, \lambda) = \frac{1}{2} \mathbf{z} ^\top Q \mathbf{z} + c^\top \mathbf{z} + \lambda^\top (A\mathbf{z} - \mathbf{b}) = \frac{1}{2} \mathbf{z}^\top Q \mathbf{z}+ \mathbf{z}^\top (c + A^\top \lambda) - \mathbf{b}^\top\lambda,$$
+
+with the dual function $g(\lambda)$ defined as the infimum of the Lagrangian over $\mathbf{z} \in \mathbb{R}^{d+1}$.
+However, the singularity of $\mathbf{Q}$ implies that the minimum of $\mathcal{L}(\mathbf{z}, \lambda)$ over $\mathbf{z}$ is only finite if the term $v = (c + A^\top\lambda)$ is orthogonal to every vector in the \emph{null space} of $\mathbf{Q}$, $\text{null}(\mathbf{Q})$.
+
+Indeed, let $\mathbf{z}$ be any non-zero vector in the null-space of $\mathbf{Q}$, i.e. ($\mathbf{z}: \mathbf{Q} \mathbf{z} = 0$). 
+Consider $\mathcal L(\mathbf{z}, \lambda)$ moving along the direction $\mathbf{z}$. Formally,
+$$\mathcal L (\mathbf{x} + \alpha \mathbf{z}, \lambda) = \frac{1}{2}(\mathbf{x} + \alpha \mathbf{z})^\top \mathbf{Q} (\mathbf{x} + \alpha \mathbf{z}) + (\mathbf{x} + \alpha \mathbf{z})^\top v - \mathbf{b} ^\top \lambda$$
+
+Expanding and using $\mathbf{z} \in \operatorname{null}(\mathbf{Q})$, we find the quadratic term to $\alpha$ to vanish:
+
+$$\mathcal L (\mathbf{x} + \alpha \mathbf{z}, \lambda) = \mathcal L (x, \lambda) + \alpha (\mathbf{z}^\top v).$$
+
+For the function to be bounded below (have a finite minimum), one must prevent the $\alpha (\mathbf{z}^\top v)$ term from driving the value to $-\infty$ as $\alpha \to \pm \infty$. This requires that $\mathbf{z}^\top v = 0$ for all $\mathbf{z} \in \text{null}(\mathbf{Q})$.
+
+This condition is equivalent to $v$ being orthogonal to the entire null-space of $\mathbf{Q}$, i.e. \[ c + A^\top\lambda \perp \text{null}(Q). \]
+
+This is a necessary condition for $\lambda$ to be a feasible point in the dual problem, i.e., for $g(\lambda) > -\infty$ (bounded).
+
+In practice, orthogonality with respect to the null-space is converted into explicit linear equality constraints.
+
+Having $Z$ as the matrix whose columns span the nullspace of $\mathbf{Q}$, the condition $c + A^\top\lambda \perp \text{null}(Q)$ is enforced by requiring that $v$ is orthogonal to all columns of $Z$.
+Formally,
+\begin{equation}
+Z^\top v = 0 \implies Z^\top (c + A^\top\lambda) = 0
+\end{equation}
+
+Rearranging gives the explicit linear equality constraints:
+\[Z^\top A^\top\lambda = -Z^\top c.\]
+As per \( g( \lambda ) \), it can be derived starting from \( \nabla_\mathbf{z} \mathcal L (\mathbf{z}, \lambda) \). Since $\mathbf{Q}$ is singular, a solution $\mathbf{z}^*$ exists if and only if $v$ is in the column space (range) of $\mathbf{Q}$, a condition which needs to also be satisfied for the minimum to exist.
+
+Whenever the Lagrangian is bounded from below, then it can be minimized imposing stationarity of the first-order derivative, resulting in:
+\begin{equation}
+\nabla_\mathbf{z} \mathcal L (\mathbf{z}, \lambda) = \mathbf{Q}\mathbf{z} + c + A^\top \lambda = 0 \implies \mathbf{z^*} = - \mathbf{Q}^+(c - A^\top \lambda)
+\end{equation}
+In turn, this result yields the dual function $g(\lambda)$ by substituting this optimal $\mathbf{z}^*$ back into the Lagrangian function:
+
+\begin{equation}
+    g(\lambda) = \mathcal L (\mathbf{z}^*, \lambda) = \frac{1}{2}v^T \mathbf{Q}^+ \mathbf{Q} \mathbf{Q}^+ v - v^T \mathbf{Q}^+ v - \mathbf{b}^T\lambda
+\end{equation}
+
+Since $\mathbf{Q}$ is symmetric, so is $\mathbf{Q}^+$, and using the pseudo-inverse property $\mathbf{Q} \mathbf{Q}^+ = I$ one can obtain the final expression for the dual objective function:
+
+$$g(\lambda) = -\frac{1}{2}v^T \mathbf{Q}^+ v - b^T\lambda$$
 
 \end{document}
