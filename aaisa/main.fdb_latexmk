@@ -1,14 +1,14 @@
 # Fdb version 4
-["bibtex main"] 1760739862.64366 "main.aux" "main.bbl" "main" 1760739864.56174 0
+["bibtex main"] 1761583304.07079 "main.aux" "main.bbl" "main" 1761583305.8591 0
   "./main.bib" 1760713814.10901 61318 9bc36f9716cce30e4cfbf555c11f7329 ""
   "/usr/local/texlive/2025/texmf-dist/bibtex/bst/natbib/plainnat.bst" 1233624470 26816 ffe5423d2019860bad9f54bc402fac15 ""
-  "main.aux" 1760739864.2005 17958 5dcc66db74abc574090611ef2a65e4a2 "pdflatex"
+  "main.aux" 1761583305.56885 18307 50c490c146de41ff27a78412f951a99b "pdflatex"
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1760739862.93168 "/Users/fracapuano/Desktop/personal/aims25/aaisa/main.tex" "main.pdf" "main" 1760739864.56194 0
-  "/Users/fracapuano/Desktop/personal/aims25/aaisa/main.tex" 1760710659.45118 338 35e02d8d1b91ab28f99e9a245436d0b7 ""
+["pdflatex"] 1761583304.34554 "/Users/fracapuano/Desktop/personal/aims25/aaisa/main.tex" "main.pdf" "main" 1761583305.85926 0
+  "/Users/fracapuano/Desktop/personal/aims25/aaisa/main.tex" 1760743092.3461 362 9005e37c0eda490629daf36d51b60b51 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc" 1136849721 2971 def0b6c1f0b107b3b936def894055589 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/tfm/jknappen/ec/ecrm1200.tfm" 1136768653 3584 f80ddd985bd00e29e9a6047ebd9d4781 ""
@@ -221,14 +221,14 @@
   "/usr/local/texlive/2025/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1756208942 5467155 19efa205003f9ecad95fbbaa6ff24da1 ""
   "/usr/local/texlive/2025/texmf-var/web2c/pdftex/pdflatex.fmt" 1756208917 3345738 bbbb93a25a0c937f0c0915ef8b1d5cd7 ""
   "/usr/local/texlive/2025/texmf.cnf" 1741450484 577 418a7058ec8e006d8704f60ecd22c938 ""
-  "body.tex" 1760739858.74718 18241 111413690544ff3b34e1cca46ef79d8f ""
+  "body.tex" 1760742982.17785 18430 49e2dd8680b92a1e2fd3a444deb785c8 ""
   "commands.tex" 1760451505.74347 1447 1b349ecf0464f9472ea5af918c14ae04 ""
   "figures/inner-vs-outer-alignment.png" 1760657905.87394 436525 cd1e6cacaa2208354086eede4fc93ad5 ""
   "format.tex" 1760451505.75497 855 e6f5714a2a2aed0980cdeb3aa5fefa23 ""
-  "main.aux" 1760739864.2005 17958 5dcc66db74abc574090611ef2a65e4a2 "pdflatex"
-  "main.bbl" 1760739862.92706 40744 0b1b4f96232d2d2a7fd507c446a754e0 "bibtex main"
-  "main.out" 1760739864.20221 565 ad9fab41762aca0277354889eb3be265 "pdflatex"
-  "main.tex" 1760710659.45118 338 35e02d8d1b91ab28f99e9a245436d0b7 ""
+  "main.aux" 1761583305.56885 18307 50c490c146de41ff27a78412f951a99b "pdflatex"
+  "main.bbl" 1761583304.34115 41313 72b15da096d049683f1665fe870c714b "bibtex main"
+  "main.out" 1761583305.57143 565 ad9fab41762aca0277354889eb3be265 "pdflatex"
+  "main.tex" 1760743092.3461 362 9005e37c0eda490629daf36d51b60b51 ""
   "preamble.tex" 1760659076.73975 1449 40a688d5421d7948842b17dc5cde2c96 ""
   (generated)
   "main.aux"

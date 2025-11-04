@@ -1,0 +1,161 @@
+% Solutions for "Optimization, MT 2025 — AIMS CDT (University of Oxford)"
+% Source of questions: AIMS_optimization_coursework (1).pdf  :contentReference[oaicite:0]{index=0}
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsthm,mathtools,bm,physics}
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage[nodayofweek,level]{datetime}
+\setlist[itemize]{nosep,left=1.5em}
+\setlist[enumerate]{nosep,left=1.5em}
+\newcommand{\R}{\mathbb{R}}
+
+\title{Optimization, AIMS CDT}
+\author{Francesco Capuano} 
+\date{\formatdate{3}{11}{2025}}
+
+\begin{document}
+\maketitle
+
+\section{Convex sets, functions and problems}
+
+\subsection{An Optimization Problem}
+
+\[
+\min_{x\in\R^2}\; x_1^2+x_2^2\quad\text{s.t.}\quad f_1(x)=\frac{x_1}{1+x_2^2}\le 0,\;\; h_1(x)=(x_1+x_2)^2=0.
+\]
+
+\paragraph{(a) Nonconvex formulation.}
+For an optimization problem to be \emph{convex}, the objective function and constraints must be convex as well. The function \( f(x_1, x_2) = x_1^2 + x_2^2 \) is convex everywhere, as the Hessian of \( f \), \( H_f(x) = 2 I \)). The equality constraint \( h_1(x) = (x_1 + x_2 )^2 \) is a convex function as well, as its Hessian \( H_{h_1}(x) = \begin{pmatrix} 2 & 2 \\ 2 & 2 \end{pmatrix} \) is positive semi-definite (\(\lambda_1 = 0, \lambda_2 = 4 \)). 
+Conversely, \( H_{f_1}(x) = \begin{pmatrix}
+    0 & -\dfrac{2x_2}{(x_2^2 + 1)^2} \\
+-\dfrac{2x_2}{(x_2^2 + 1)^2} & \dots \end{pmatrix} \) is not positive semi-definite. 
+Indeed, the determinant is 
+\[ \det H_{f_1}(x) = - \frac{4x_2^2}{(x_2^2 + 1)^2} \leq 0 \, \forall x \in \mathbb{R}^2, \]
+which in turn makes the whole problem non-convex.
+
+\paragraph{(b) Feasible set \& equivalent convex problem.}
+As \( 1+x_2^2>0 \, \forall x \in \mathbb R^2 \) , the inequality \( \frac{x_1}{(1+x_2^2)}\le 0 \) coincides with \( x_1\le 0\). 
+Moreover, $(x_1+x_2)^2=0$ is equivalent to the affine equality $x_1+x_2=0$. Thus the feasible set is
+\[
+\mathcal X = \{x\in\R^2\mid x_1\le 0,\; x_1+x_2=0\} \equiv \{t \in \mathbb R^+ : (-t,t) \}.
+\]
+
+On \( \mathcal X \) the objective function coincides with \( x_1^2+x_2^2=2t^2 \), which is minimized at \( t^\star=0 \), i.e.\ $x^\star=(0,0)$. A \emph{convex} reformulation that is equivalent to the original problem therefore is:
+\[
+\min_{x\in\R^2}\; x_1^2+x_2^2\quad\text{s.t.}\quad x_1+x_2=0,\;\; x_1\le 0,
+\]
+or, in one-dimension only, $\min_{t\ge 0} t^2$.
+Both formulations are convex.
+
+\subsection{Hyperbolic constraints}
+For $x\in\R^n$, $y,z\in\R$ with $y\ge 0$, $z\ge 0$, prove that:
+\begin{equation}\label{eq:hyperbolic-to-cone}
+\| \begin{pmatrix} 2x, & y-z \end{pmatrix}^\top \|_2^2 \le (y+z)^2
+\end{equation}
+
+\begin{proof}
+Expanding the right-hand side, 
+\begin{align}
+\| \begin{pmatrix} 2x, & y-z \end{pmatrix}^\top \|_2^2 &\le (y+z)^2 \\ 
+\begin{pmatrix} 2x, & y-z \end{pmatrix} \begin{pmatrix} 2x, \\ y-z \end{pmatrix} &\le (y+z)^2 \\
+4x^\top x+(y-z)^2 &\le y^2+2yz+z^2 \\ 
+4x^\top x &\le 4yz \\ 
+x^\top x &\le yz 
+\end{align}
+\end{proof}
+
+\paragraph{(a) Maximizing the harmonic mean.}
+Let $t_i \geq (a_i^\top x-b_i)^{-1} > 0 $ (from \( \mathcal X = \{ x \in \mathbb R^n : Ax>b \} \)). 
+Then, the optimization problem can be rewritten as:
+\begin{align}\label{eq:prob-harmonic-mean}
+\min_t & \mathbf{1}^\top t \\
+t_i & \geq (a_i^\top x-b_i)^{-1}, \quad \forall i \notag
+\end{align}
+
+The constraint:
+\[
+t_i (a_i^\top x + b_i) \ge 1, \qquad t_i \ge 0, \quad a_i^\top x + b_i > 0,
+\]
+is referred to as \emph{hyperbolic} because, if we let
+\( u = a_i^\top x + b_i, \, v = t_i, \) the \emph{equality} \(u v = 1\) defines a hyperbola in the \((u,v)\)-plane, and the feasible set:
+\[
+\mathcal X = \{ (u,v) \mid u v \ge 1 \}
+\]
+corresponds to the region on (or above) the hyperbola, thus the name \emph{hyperbolic constraint}.
+
+Clearly, \( \mathcal X \) is \emph{not} convex---the segment between two points on opposite branches do not satisfy \( uv \geq 1 \). 
+However, one can handle hyperbolic constraints (i.e., hyperbolic feasible sets) within a convex optimization problem by rewriting them in terms of a \emph{second-order cone} (SOC), representing a convex set in a higher-dimensional space.
+
+From eq.~\ref{eq:hyperbolic-to-cone}, by choosing \(w = 2\), we obtain the equivalence
+\[
+u v \ge 1
+\quad \Longleftrightarrow \quad
+\left\|
+\begin{bmatrix}
+2 \\ u - v
+\end{bmatrix}
+\right\|_2
+\le
+u + v, 
+\quad u, v \ge 0.
+\]
+Substituting back \(u = a_i^\top x + b_i\) and \(v = t_i\), the hyperbolic constraint can thus be expressed as the SOC (convex) constraint
+\[
+\left\|
+\begin{bmatrix}
+2 \\ a_i^\top x + b_i - t_i
+\end{bmatrix}
+\right\|_2
+\le
+a_i^\top x + b_i + t_i,
+\qquad
+t_i \ge 0, \quad a_i^\top x + b_i \ge 0.
+\]
+
+This result allows to tackle problem~\ref{eq:prob-harmonic-mean} using convex optimization, as both the objective function and constraints are convex.
+
+\subsection*{3. Support functions}
+Let $S_C(y):=\sup\{y^\top x \vert x\in C\}$ (possibly $+\infty$).
+
+\paragraph{(a) Convexity of \(S_C\).}
+The support function of a set \(C\subseteq\mathbb{R}^n\) is
+\[
+S_C(y) = \sup_{x\in C} y^\top x.
+\]
+Each function \(f_x(y)=y^\top x\) is linear (hence convex) in \(y\), and \(S_C\) is their pointwise supremum:
+\[
+S_C(y) = \sup_{x\in C} f_x(y).
+\]
+Since the supremum of convex functions is convex (§3.2.3, B\&V), \(S_C\) is in turn convex for any set \(C\).
+
+\paragraph{(b) $S_C=S_{\operatorname{conv}(C)}$.}
+Clearly, $\operatorname{conv}(C)\supseteq C$, which results in $S_{\operatorname{conv}(C)}\ge S_C$, in keeping with the geometric interpretation of \( S_C \). Conversely, for any given $x \in \operatorname{conv}(C): x=\sum_{i}\theta_i x_i$ ($\theta_i\ge 0$, $\sum \theta_i=1$, $x_i\in C$),
+\[
+y^\top x=\sum_i \theta_i\, y^\top x_i\le \sum_i \theta_i\, S_C(y) \leq S_C(y).
+\]
+The equality holds for any \( x \in \operatorname{conv}(C) \), and thus it must hold for the supremum over \( \operatorname{conv}(C) \) too, yielding \( S_{\operatorname{conv}(C)} \gtreqless S_C \).
+
+\subsection*{4. Largest-$L$ norm}
+For $x\in\R^n$, sort $|x|$ in non-increasing order, and define $\|x\|_{[L]} =\sum_{i=1}^L |x|_{[i]}$.
+
+\paragraph{(a) Convexity.}
+The largest-$L$ norm can alternatively be represented as:
+\begin{equation}\label{eq:largest-l-norm}
+\|x\|_{[L]}=\max_y \Big\{\,y^\top x\ : \ \|y\|_\infty\le 1,\ \|y\|_1\le L\,\Big\},
+\end{equation}
+similarly to how support functions are represented too. 
+The first constraint on \( y \) ensures the norm computed solving \( \max_y y^\top x \) is not larger than the real norm, while the second ensures it is not smaller.
+Being a (support) linear function defined on a convex set---intersecting sets preserves convexity, and "all norms on \( \mathbb{R}^n \) are convex functions", §3.1.5, B\&V)---$\|x\|_{[L]}$ is convex.
+
+\paragraph{(b) Integer programming (IP) formulation.}
+In keeping with the result just presented, one can write the largest-L norm as an integer programming (i.e., combinatorial optimization) problem, where the variables $z_i\in\{0,1\}$ select which indices in \( x \) to use to form the norm.
+This results in:
+\[
+\|x\|_{[L]}=\max_z \Big\{\sum_{i=1}^n |x_i|\, z_i\ : \sum_{i=1}^n z_i=L,\ z_i\in\{0,1\}\Big\}.
+\]
+
+\paragraph{(c) Linear programming formulation.}
+Given in (a).
+
+
+\end{document}

@@ -1,4 +1,4 @@
-\begin{thebibliography}{17}
+\begin{thebibliography}{18}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -23,6 +23,13 @@ Yonatan Belinkov.
 \bibitem[Capuano et~al.(2025)Capuano, Pascal, Zouitine, Wolf, and Aractingi]{capuanoRobotLearningTutorial2025}
 Francesco Capuano, Caroline Pascal, Adil Zouitine, Thomas Wolf, and Michel Aractingi.
 \newblock Robot {{Learning}}: {{A Tutorial}}, October 2025.
+
+\bibitem[Christian et~al.(2025)Christian, Kirk, Thompson, Summerfield, and Dumbalska]{christianRewardModelInterpretability2025}
+Brian Christian, Hannah~Rose Kirk, Jessica~A.F. Thompson, Christopher Summerfield, and Tsvetomira Dumbalska.
+\newblock Reward {{Model Interpretability}} via {{Optimal}} and {{Pessimal Tokens}}.
+\newblock In \emph{Proceedings of the 2025 {{ACM Conference}} on {{Fairness}}, {{Accountability}}, and {{Transparency}}}, pages 1048--1059, Athens Greece, June 2025. ACM.
+\newblock ISBN 979-8-4007-1482-5.
+\newblock \doi{10.1145/3715275.3732068}.
 
 \bibitem[Connell and Mahadevan(1993)]{connellRobotLearning1993a}
 Jonathan~H. Connell and Sridhar Mahadevan, editors.
