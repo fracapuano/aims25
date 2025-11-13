@@ -6,3 +6,5 @@ A repository for all the coursework of the AIMS CDT, 2025 at the University of O
 ### [Signal Processing](./signal-processing/)
 
 ### [Optimization](./optimization/)
+
+### [Machine Learning](./machine-learning/)
