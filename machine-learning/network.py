@@ -41,8 +41,8 @@ class MiniMLP:
     def __init__(self,
         in_features: int,
         out_features: int,
-        hidden_features: int,
-        n_layers: int,
+        hidden_features: int = 128,
+        n_layers: int = 3,
         init_kind: Literal["xavier", "he"] = "he",
     ):
         self.in_features = in_features
