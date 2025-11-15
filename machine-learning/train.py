@@ -56,7 +56,7 @@ def eval_epoch(
         
         progress_bar.update(1)
 
-    progress_bar.close()    
+    progress_bar.close()
 
 
 def main():
@@ -96,7 +96,7 @@ def main():
     flow_mlp = MiniFlowMLP(mlp=mlp, mlp_time=time_embedding_mlp, **flow_config)
 
     key = jax.random.PRNGKey(42)
-    train_key, eval_key = jax.random.split(key, 2)
+    key, train_key, eval_key = jax.random.split(key, 3)
 
     params = flow_mlp.init_params(key=key)
 
@@ -113,7 +113,7 @@ def main():
 
     optimizer = MiniOptimizer(**optimizer_config)
 
-    eval_every = 1
+    eval_every = 3
     training_step = 0
     global_state = {"training_step": training_step}
 
@@ -123,6 +123,11 @@ def main():
         if epoch % eval_every == 0:
             eval_epoch(flow_mlp, params, eval_dataloader, eval_key)
         
+        # reshuffles the dataloader
+        seed = train_dataloader.seed + jax.random.randint(key=key, shape=(1,), minval=0, maxval=100).item()
+        train_dataloader.refresh_iter(seed)
+        key, _ = jax.random.split(key)
+
         training_step += 1
 
 if __name__ == "__main__":
