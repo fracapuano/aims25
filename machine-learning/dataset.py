@@ -3,12 +3,23 @@ from datasets import load_dataset
 
 class EEG2MEGDataloader:
     """A Jax-based wrapper around dataset to perform data loading."""
-    def __init__(self, dataset_id: str, split:str="train", batch_size:int=32, seed=42):
+    def __init__(self, dataset_id: str, split:str="train", batch_size:int=32, seed:int=42):
         self.batch_size = batch_size
+        self.seed = seed
 
         self.dataset = load_dataset(dataset_id, split=split).with_format("jax")
-        self.dataset_iter = self.dataset.shuffle(seed=seed).iter(batch_size=self.batch_size)
+        self._make_iter()
     
+    def _make_iter(self):
+        self.dataset_iter = self.dataset.shuffle(seed=self.seed).iter(batch_size=self.batch_size)
+
+    def refresh_iter(self, seed:int=42):
+        self.seed = seed
+        self._make_iter()
+
+    def __len__(self):
+        return len(self.dataset) // self.batch_size
+
     def _prepare_batch(self, batch: dict) -> dict:
         raise NotImplementedError("Subclasses of this dataloader must implement this functionality.")
 
