@@ -16,10 +16,12 @@ def train_epoch(
     global_state: dict,
     key: jax.random.PRNGKey = jax.random.PRNGKey(42),
 ) -> ModelParameters:
-    # total = total number of iterations you expect
+    """Runs a single optimization epoch, conditioned on the state of the optimizer."""
     total_steps = len(dataloader.dataset) // dataloader.batch_size
     progress_bar = tqdm(total=total_steps, desc="Training")
+
     training_step = global_state["training_step"]
+    optimizer_state = global_state["optimizer_state"]
 
     for batch in dataloader:
         x = batch["meg"]  # extracting the meg part only and training a FM model on that
@@ -30,14 +32,21 @@ def train_epoch(
         grads = grad_loss_function(params)
 
         # Perform a (dummy) update step using gradients
-        params = optimizer.update(params=params, grad=grads, step=training_step)
+        optimizer_state = optimizer.update(
+            params=params, grad=grads, step=training_step, **optimizer.prepare(optimizer_state)
+        )
+        params = optimizer_state["params"]
+
         training_step += 1
         progress_bar.update(1)
 
     global_state["training_step"] = training_step
+    global_state["optimizer_state"] = optimizer_state
+    global_state["params"] = params
+
     progress_bar.close()
 
-    return params, global_state
+    return global_state
 
 def eval_epoch(
         model: MiniFlowMLP,
@@ -101,11 +110,13 @@ def main():
     params = flow_mlp.init_params(key=key)
 
     n_epochs = 5  # minimal training
+    eval_every = 3
 
     optimizer_config = dict(
-        name = "sgd",
+        name = "momentum",
         total_steps = (n_epochs - 1) * len(train_dataloader),
         warmup_steps = len(train_dataloader),
+        kwargs={"beta": 0.99}
     )
 
     training_config["optimizer_config"] = optimizer_config
@@ -113,12 +124,15 @@ def main():
 
     optimizer = MiniOptimizer(**optimizer_config)
 
-    eval_every = 3
     training_step = 0
-    global_state = {"training_step": training_step}
+    global_state = {
+        "params": params,
+        "training_step": training_step,
+        "optimizer_state": optimizer.initialize_state(params),
+    }
 
     for epoch in range(n_epochs):
-        params, global_state = train_epoch(flow_mlp, params, train_dataloader, optimizer, global_state, train_key)
+        global_state = train_epoch(flow_mlp, params, train_dataloader, optimizer, global_state, train_key)
 
         if epoch % eval_every == 0:
             eval_epoch(flow_mlp, params, eval_dataloader, eval_key)
