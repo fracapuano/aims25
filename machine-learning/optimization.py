@@ -54,8 +54,37 @@ def rmsprop_update(params: ModelParameters, grad: Gradients, gsquare: Gradients,
     }
 
 
-def adam_update():
-    pass
+def adam_update(params: ModelParameters, grad: Gradients, momentum: Gradients, gsquare: Gradients, beta: float, gamma: float, learning_rate: float, training_step: int) -> OptimizerState:
+    # Use 1-based step index for bias correction
+    t = training_step + 1
+    momentum = jax.tree.map(
+        lambda m, g: beta * m + (1 - beta) * g, momentum, grad
+    )
+    gsquare = jax.tree.map(
+        lambda old_g, g: gamma * old_g + (1 - gamma) * g**2, gsquare, grad
+    )
+
+    momentum_corrected = jax.tree.map(
+        lambda m: m / (1 - beta ** t), momentum
+    )
+
+    gsquare_corrected = jax.tree.map(
+        lambda gs: gs / (1 - gamma ** t), gsquare
+    )
+
+    return {
+        "params": jax.tree.map(
+            lambda p, m, v: p - (learning_rate / (jnp.sqrt(v) + EPSILON)) * m,
+            params, momentum_corrected, gsquare_corrected
+        ),
+        # Optimizer state
+        "momentum": momentum,
+        "gsquare": gsquare,
+        "training_step": training_step,
+        "beta": beta,  # beta1 in official implementations
+        "gamma": gamma  # beta2 in official implementations
+    }
+
 
 def adamw_update():
     pass
@@ -97,6 +126,7 @@ PREPARE = {
     "momentum": lambda s: {"momentum": s["momentum"], "beta": s["beta"]},
     "adagrad": lambda s: {"gsquare": s["gsquare"]},
     "rmsprop": lambda s: {"gsquare": s["gsquare"], "gamma": s["gamma"]},
+    "adam": lambda s: {"momentum": s["momentum"], "gsquare": s["gsquare"], "training_step": s["training_step"], "beta": s["beta"], "gamma": s["gamma"]}
 }
 
 def _initialize_momentum(params: ModelParameters, beta: float) -> OptimizerState:
@@ -107,6 +137,9 @@ def _initialize_adagrad(params: ModelParameters) -> OptimizerState:
 
 def _initialize_rmsprop(params: ModelParameters, gamma: float) -> OptimizerState:
     return {"gsquare": jax.tree.map(jnp.zeros_like, params), "gamma": gamma}
+
+def _initialize_adam(params: ModelParameters, beta: float, gamma: float) -> OptimizerState:
+    return {"momentum": jax.tree.map(jnp.zeros_like, params), "gsquare": jax.tree.map(jnp.zeros_like, params), "beta": beta, "gamma": gamma, "training_step": 0}
 
 class MiniOptimizer:
     def __init__(self, name:str, total_steps:int, warmup_steps: Optional[int]=None, peak_lr:Optional[float]=1e-3, kwargs:dict={}):  # or 3e-4 for Karpathy's constant
@@ -133,6 +166,8 @@ class MiniOptimizer:
             return _initialize_adagrad(params=params)
         elif self.name == "rmsprop":
             return _initialize_rmsprop(params=params, gamma=self.kwargs["gamma"])
+        elif self.name == "adam":
+            return _initialize_adam(params=params, beta=self.kwargs["beta"], gamma=self.kwargs["gamma"])
 
     def prepare(self, state: OptimizerState) -> OptimizerState:
         return PREPARE[self.name](state)
@@ -140,5 +175,6 @@ class MiniOptimizer:
     def update(self, params: ModelParameters, grad: Gradients, step: int, **kwargs) -> OptimizerState:
         learning_rate = self.scheduler(step)
         wandb.log({"train/lr": learning_rate})
-        
-        return self._update_function(params=params, grad=grad,learning_rate=learning_rate, **kwargs)
+        # Ensure algorithms that require training_step (e.g., Adam) receive the current step
+        kwargs = {**kwargs, "training_step": step}
+        return self._update_function(params=params, grad=grad, learning_rate=learning_rate, **kwargs)

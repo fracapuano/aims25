@@ -100,6 +100,18 @@ In contrast to AdaGrad, RMSProp is therefore typically less sensitive to poor in
 
 ### Bias correction, or $\hat{\bullet}$
 
+Both momentum $m_t$ and learning rate scalers $v_t$ are initialized to vectors of all zeros $m_0 = v_0 = \mathbf{0}$, which in turn results in rather biased (small) estimates for both $m_t$ and $v_t$, especially early on in the training process.
+Critically, this bias might complicate the optimization process, and ultimately hinder superior performance.
+In Adam, Kingma et al. propose bias-correcting the current estimate for $m_t$ and $v_t$ using the momentum coefficient $\beta$ and "forgetting-factor" $\gamma$.
+Formally,
+$$
+\begin{align*}
+\hat{m}_t &= \frac{m_t}{1 - \beta^t} \implies \hat{m}_t \xrightarrow[t \to \infty]{} m_t \\
+\hat{v}_t &= \frac{v_t}{1 - \gamma^t} \implies \hat{v}_t \xrightarrow[t \to \infty]{} v_t\\
+\end{align*}
+$$
+
+Together with Momentum and the RMSProp update, bias correction describes the Adam update rule in its entirety. 
 
 ## [AdamW]()
 
