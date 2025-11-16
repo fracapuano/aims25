@@ -135,7 +135,7 @@ def main():
         global_state = train_epoch(flow_mlp, global_state["params"], train_dataloader, optimizer, global_state, train_key)
 
         if epoch % eval_every == 0:
-            eval_epoch(flow_mlp, params, eval_dataloader, eval_key)
+            eval_epoch(flow_mlp, global_state["params"], eval_dataloader, eval_key)
         
         # reshuffles the dataloader
         seed = train_dataloader.seed + jax.random.randint(key=key, shape=(1,), minval=0, maxval=100).item()
