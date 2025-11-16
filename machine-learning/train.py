@@ -132,7 +132,7 @@ def main():
     }
 
     for epoch in range(n_epochs):
-        global_state = train_epoch(flow_mlp, params, train_dataloader, optimizer, global_state, train_key)
+        global_state = train_epoch(flow_mlp, global_state["params"], train_dataloader, optimizer, global_state, train_key)
 
         if epoch % eval_every == 0:
             eval_epoch(flow_mlp, params, eval_dataloader, eval_key)
