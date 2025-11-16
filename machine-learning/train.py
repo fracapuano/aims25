@@ -69,7 +69,6 @@ def eval_epoch(
 
 
 def main():
-
     DIM_IN = 400
     EMBED_DIM = 128
     DIM_OUT = 400
@@ -113,10 +112,9 @@ def main():
     eval_every = 3
 
     optimizer_config = dict(
-        name = "momentum",
+        name = "adagrad",
         total_steps = (n_epochs - 1) * len(train_dataloader),
-        warmup_steps = len(train_dataloader),
-        kwargs={"beta": 0.99}
+        warmup_steps = len(train_dataloader)
     )
 
     training_config["optimizer_config"] = optimizer_config

@@ -53,10 +53,40 @@ $$
 Effectively, by using $ \ell_k (\theta_t - \eta \beta m_{t-1}) $ in the parameter update, differential information is employed to perform corrections in the direction of momentum.
 
 ### Adaptive Learning Rates, or $v_t$
+Momentum proves useful in guaranteeing smoother, more stable optimization routines, embedding inertial information into the optimization by reusing differential information collected earlier in the training process.
+However, it tragically suffers from the need to sensitivity to hyper-parameters, including both the learning rate $\eta$ and momentum factor $\beta$.
+While hyperparameter tuning is oftentimes simply necessary to have obtain good performance, in the 2010s many works ([AdaGrad, 2011](https://www.jmlr.org/papers/volume12/duchi11a/duchi11a.pdf), [Adadelta, 2012](https://arxiv.org/pdf/1212.5701), [RMSProp, 2012](https://www.cs.toronto.edu/~tijmen/csc321/slides/lecture_slides_lec6.pdf)) set out to reduce the dependancy of the optimization process on the identification of an optimal learning rate, propsing *adaptive scalers* $v_t$ of a given initial learning rate $\eta$.
 
-Adagrad
+Different in their implementation relatively to how they all reuse previous information, AdaGrad, Adadelta and RMSProp all rely on the rather similar conceptual underpinning of normalizing the learning rate $\eta$ per parameter by the scale of the updates received.
+In this, the intuition behind the different methods is that parameters that receive updates less often (i.e., parameters which stay closer to their initialized value during training) should---to improve on convergence---use larger stepsizes $\eta$ than parameters which receive updates often during training, which in turn should---to increase stability---be updated less drastically. 
+Formally, this intuition results in an update rule like:
+$$
+\begin{align*}
+\theta_{t+1} &= \theta_t - 
+\frac{\eta}{v_t} g_t, \\
+g_t &= \sum_{k \in \mathcal{B}} \nabla \ell_k (\theta_t)
+\end{align*}
+$$
+where the term $v_t \in \mathbb R^d \ni \theta_t \, \forall t $ is used to scale the learning rate per-parameter $\theta_{t,i} \in \theta_t$.
 
-RMSProp
+**AdaGrad** uses the sum of the squared gradients up to $t$ to scale the learning rate.
+Formally,
+$$
+\begin{align*}
+v_t &= \operatorname{diag}(G_t)^{\tfrac12}, \implies \theta_{t+1} = \theta_t - 
+\eta \operatorname{diag}(G_t)^{-\tfrac 12} \odot g_t, \, \tag{AdaGrad} \\
+G_t &= \sum_{i=1}^t g_i g_i^\top = G_{t-1} + g_t g_t^\top
+\end{align*}
+$$
+
+The matrix $G_t$ serves as an accumulator of the information contained in the updates up to $t$, and in particular it can be understood as a measure of the magnitude of per-parameter update up to $t$.
+Indeed, considering the $j$-th parameter in $(\operatorname{diag}G_t)$ is the same as measuring the Root Mean Square (RMS) of the variations that intervened on that very same $j$ up to a multipliticative factor depending on $t$ ($\sqrt(t)$), as it follows from 
+$$
+\operatorname{RMS}(g_1, g_2 \dots, g_t) = \sqrt{\frac 1t \sum_{i=1}^t g_i^2 } \implies \operatorname{diag}(G_t)^{\tfrac 12} = \sqrt{t} \cdot \operatorname{RMS}(g_1, g_2 \dots, g_t)
+$$
+
+By scaling the learning rate for parameter $j$ by $\eta$ by $\sqrt{t} \cdot \operatorname{RMS}((g_1)_j, (g_2)_j, \dots, (g_t)_j)$ one has that, at the same point in training (i.e., for the same $t$), less frequently updated parameters (for which the RMS tends to be smaller) receive larger updates compared to more often updated parameters, for which the RMS of previous gradients is larger.
+
 
 ### Bias correction, or $\hat{\bullet}$
 

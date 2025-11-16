@@ -5,6 +5,8 @@ import jax
 import jax.numpy as jnp
 import wandb
 
+EPSILON = 1e-8
+
 
 def sgd_update(params: ModelParameters, grad: Gradients, learning_rate: float) -> OptimizerState:
     return {
@@ -23,11 +25,19 @@ def momentum_update(params: ModelParameters, grad: Gradients, momentum: Gradient
         "beta": beta
     }
 
-def adagrad_update():
-    pass
+def adagrad_update(params: ModelParameters, grad: Gradients, gsquare: Gradients, learning_rate: float) -> OptimizerState:
+    gsquare = jax.tree.map(
+        lambda old_g, g: old_g + g**2, gsquare, grad
+    )
 
-def rmsprop_update():
-    pass
+    return {
+        "params": jax.tree.map(
+            lambda p, gs, g: p - (learning_rate/(jnp.sqrt(gs) + EPSILON)) * g, params, gsquare, grad
+        ),
+        # Optimizer state
+        "gsquare": gsquare
+    }
+
 
 def adam_update():
     pass
@@ -70,11 +80,14 @@ UPDATES = {
 PREPARE = {
     "sgd": lambda s: s,
     "momentum": lambda s: {"momentum": s["momentum"], "beta": s["beta"]},
+    "adagrad": lambda s: {"gsquare": s["gsquare"]},
 }
 
 def _initialize_momentum(params: ModelParameters, beta: float) -> ModelParameters:
     return {"momentum": jax.tree.map(jnp.zeros_like, params), "beta": beta}
 
+def _initialize_gsquare(params: ModelParameters) -> ModelParameters:
+    return {"gsquare": jax.tree.map(jnp.zeros_like, params)}
 
 class MiniOptimizer:
     def __init__(self, name:str, total_steps:int, warmup_steps: Optional[int]=None, peak_lr:Optional[float]=1e-3, kwargs:dict={}):  # or 3e-4 for Karpathy's constant
@@ -97,6 +110,8 @@ class MiniOptimizer:
             return {}
         elif self.name == "momentum":
             return _initialize_momentum(params=params, beta=self.kwargs["beta"])
+        elif self.name == "adagrad":
+            return _initialize_gsquare(params=params)
 
     def prepare(self, state: OptimizerState) -> OptimizerState:
         return PREPARE[self.name](state)
@@ -106,13 +121,3 @@ class MiniOptimizer:
         wandb.log({"train/lr": learning_rate})
         
         return self._update_function(params=params, grad=grad,learning_rate=learning_rate, **kwargs)
-
-
-    # def update(self, params):
-    #     for k, update in grad:
-    #         if update.ndim ... :  # update for the weight *matrices*
-    #             muon_update()
-    #         else:
-    #             adamw_update()
-
-    #     return new_params
