@@ -87,8 +87,19 @@ $$
 
 By scaling the learning rate for parameter $j$ by $\eta$ by $\sqrt{t} \cdot \operatorname{RMS}((g_1)_j, (g_2)_j, \dots, (g_t)_j)$ one has that, at the same point in training (i.e., for the same $t$), less frequently updated parameters (for which the RMS tends to be smaller) receive larger updates compared to more often updated parameters, for which the RMS of previous gradients is larger.
 
+When computing $ G_t = \sum_{i=1}^t g_i g_i^\top $ all past gradients have similar weight across $1, \dots, t$. 
+Because earlier in the training procedure gradients are likely to be large due to initialization, considering all gradients equally may result in an excessive shrinking of the learning rate, hindering performance.
+**RMSProp** directly addresses this by maintaining a (soft) receptive field of $\frac{1}{1-\gamma}$ steps only when aggregating incoming gradients, using the update:
+$$
+G_t = \gamma \cdot G_{t-1} + (1-\gamma) \cdot g_t g_t^\top.
+$$
+In turn, RMSProp effectively maintains the summation of squared gradients more aligned with the current optimization, mitigating the aforementioned excessive shrinking of the learning rate.
+In contrast to AdaGrad, RMSProp is therefore typically less sensitive to poor initialization, and just like AdaGrad it retains the need to define a global learning rate $\eta$ to be scaled down when needed.
+
+> Sidenote: **AdaDelta** is an optimization algorithm that learns without defining a global learning rate. In that, it maintains a running average of the square parameter update, and uses it alongside the RMSProp-like average of square gradients to completely sidestep the need to define a global learning rate $\eta$.
 
 ### Bias correction, or $\hat{\bullet}$
+
 
 ## [AdamW]()
 

@@ -39,6 +39,21 @@ def adagrad_update(params: ModelParameters, grad: Gradients, gsquare: Gradients,
     }
 
 
+def rmsprop_update(params: ModelParameters, grad: Gradients, gsquare: Gradients, learning_rate: float, gamma: float) -> OptimizerState:
+    windowed_gsquare = jax.tree.map(
+        lambda old_g, g: gamma * old_g + (1 - gamma) * g**2, gsquare, grad
+    )
+
+    return {
+        "params": jax.tree.map(
+            lambda p, gs, g: p - (learning_rate/(jnp.sqrt(gs) + EPSILON)) * g, params, windowed_gsquare, grad
+        ),
+        # Optimizer state
+        "gsquare": windowed_gsquare,
+        "gamma": gamma
+    }
+
+
 def adam_update():
     pass
 
@@ -81,13 +96,17 @@ PREPARE = {
     "sgd": lambda s: s,
     "momentum": lambda s: {"momentum": s["momentum"], "beta": s["beta"]},
     "adagrad": lambda s: {"gsquare": s["gsquare"]},
+    "rmsprop": lambda s: {"gsquare": s["gsquare"], "gamma": s["gamma"]},
 }
 
-def _initialize_momentum(params: ModelParameters, beta: float) -> ModelParameters:
+def _initialize_momentum(params: ModelParameters, beta: float) -> OptimizerState:
     return {"momentum": jax.tree.map(jnp.zeros_like, params), "beta": beta}
 
-def _initialize_gsquare(params: ModelParameters) -> ModelParameters:
+def _initialize_adagrad(params: ModelParameters) -> OptimizerState:
     return {"gsquare": jax.tree.map(jnp.zeros_like, params)}
+
+def _initialize_rmsprop(params: ModelParameters, gamma: float) -> OptimizerState:
+    return {"gsquare": jax.tree.map(jnp.zeros_like, params), "gamma": gamma}
 
 class MiniOptimizer:
     def __init__(self, name:str, total_steps:int, warmup_steps: Optional[int]=None, peak_lr:Optional[float]=1e-3, kwargs:dict={}):  # or 3e-4 for Karpathy's constant
@@ -111,7 +130,9 @@ class MiniOptimizer:
         elif self.name == "momentum":
             return _initialize_momentum(params=params, beta=self.kwargs["beta"])
         elif self.name == "adagrad":
-            return _initialize_gsquare(params=params)
+            return _initialize_adagrad(params=params)
+        elif self.name == "rmsprop":
+            return _initialize_rmsprop(params=params, gamma=self.kwargs["gamma"])
 
     def prepare(self, state: OptimizerState) -> OptimizerState:
         return PREPARE[self.name](state)

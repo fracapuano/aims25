@@ -112,9 +112,10 @@ def main():
     eval_every = 3
 
     optimizer_config = dict(
-        name = "adagrad",
+        name = "rmsprop",
         total_steps = (n_epochs - 1) * len(train_dataloader),
-        warmup_steps = len(train_dataloader)
+        warmup_steps = len(train_dataloader),
+        kwargs={"gamma": 0.9}
     )
 
     training_config["optimizer_config"] = optimizer_config
