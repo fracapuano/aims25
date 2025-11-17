@@ -111,8 +111,16 @@ $$
 \end{align*}
 $$
 
-Together with Momentum and the RMSProp update, bias correction describes the Adam update rule in its entirety. 
 
-## [AdamW]()
+## [AdamW](https://arxiv.org/abs/1711.05101)
+Regularizing the training of NNs has shown premise in improving train-test generalization.
+In practice, regularization can be performed by (1) modifying the input data to increase training-set diversity and therefore improve on generalization (2) modifying the architecture introducing elements limiting the model capacity (smaller models, dropout, etc.) and (3) introducing an explicit regularization term in the loss function $L(\theta) = \sum_{i \in \mathcal D} \ell_i(\theta) + \lambda \Vert \theta \Vert$, for some norm $\Vert \bullet \Vert$.
+For instance, $\Vert \bullet \Vert_1$ is known to induce sparsity in the weights $\Vert \bullet \Vert_1$ whereas $\Vert \bullet \Vert_2$ penalizes large values of weights and has been observed to improve on overfitting.
 
-## [Muon]()
+AdamW was introduced as an effort to regularize Adam introducing *weight decay*, although critically *without* modifying the loss function $L$ to prevent regularization from affecting the first and second moment estimates $m_t$ and $v_t$.
+In practice, given a regularization term $\lambda$, the AdamW update rule can be rewritten as:
+$$
+\begin{equation*}
+\theta_{t} = \theta_{t-1} + \eta \bigg( \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon} + \lambda \theta_{t-1} \bigg) \tag{AdamW}
+\end{equation*}
+$$
