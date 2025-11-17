@@ -1,5 +1,5 @@
 from typing import Optional
-from utils import ModelParameters, Gradients, OptimizerState
+from utils import ModelParameters, Gradients, OptimizerState, orthogonalize, cosine_scheduling
 
 import jax
 import jax.numpy as jnp
@@ -98,26 +98,49 @@ def adamw_update(params: ModelParameters, grad: Gradients, momentum: Gradients, 
     return adam_state | {"params": p, "lambda_wd": lambda_wd}
 
 
-def _2d_muon_update():
-    pass
+def _adamw_update(p: jnp.ndarray, g: jnp.ndarray, m: jnp.ndarray, gs: jnp.ndarray, beta: float, gamma: float, learning_rate: float, training_step: int, lambda_wd: float) -> jnp.ndarray:
+    t = training_step + 1
+    m = beta * m + (1 - beta) * g
+    gs = gamma * gs + (1 - gamma) * (g**2)
 
-def muon_update():
-    pass
+    # Bias correction
+    m_hat = m / (1 - beta ** t)
+    gs_hat = gs / (1 - gamma ** t)
 
-def cosine_scheduling(warmup_steps: int, total_steps: int, peak_lr: float):
-    """A minimalistic implementation of cosine scheduling with linear warmup."""
-    assert total_steps != warmup_steps, "Warmup steps must be strictly less than total steps!"
-    decay_steps = total_steps - warmup_steps
+    old_p = p
+    return p - learning_rate * (m_hat / (jnp.sqrt(gs_hat) + EPSILON) + lambda_wd * old_p)
 
-    def _lr(step: int)->float:
-        step = jnp.asarray(step)
-        warmup_lr = peak_lr * (step / warmup_steps)
-        t = jnp.clip((step - warmup_steps) / decay_steps, 0., 1.)
 
-        cosine_lr = 0.5 * peak_lr * (1+jnp.cos(jnp.pi * t))
-        return jnp.where(step < warmup_steps, warmup_lr, cosine_lr)
+def _muon_update(p: jnp.ndarray, g: jnp.ndarray, m: jnp.ndarray, beta: float, learning_rate: float) -> jnp.ndarray:
+    o = orthogonalize(m)
 
-    return _lr
+    return p - learning_rate * o
+
+
+def muon_update(params: ModelParameters, grad: Gradients, momentum: Gradients,  gsquare: Gradients, beta: float, gamma: float, learning_rate: float, training_step: int, lambda_wd: float) -> OptimizerState:
+    momentum = jax.tree.map(
+        lambda m, g: beta * m + (1 - beta) * g, momentum, grad
+    )
+    gsquare = jax.tree.map(
+        lambda old_g, g: gamma * old_g + (1 - gamma) * g**2, gsquare, grad
+    )
+
+    def _parameter_update(p, g, m, gs):
+        if p.ndim==2 and g.ndim==2 and m.ndim==2 and gs.ndim==2:
+            return _muon_update(p, g, m, beta, learning_rate)
+        else:
+            return _adamw_update(p, g, m, gs, beta, gamma, learning_rate, training_step, lambda_wd)
+
+    return {
+        "params": jax.tree.map(_parameter_update, params, grad, momentum, gsquare), 
+        # Optimizer state
+        "momentum": momentum,
+        "gsquare": gsquare,
+        "training_step": training_step,
+        "beta": beta,
+        "gamma": gamma,
+        "lambda_wd": lambda_wd
+    }
 
 
 UPDATES = {
@@ -136,7 +159,9 @@ PREPARE = {
     "adagrad": lambda s: {"gsquare": s["gsquare"]},
     "rmsprop": lambda s: {"gsquare": s["gsquare"], "gamma": s["gamma"]},
     "adam": lambda s: {"momentum": s["momentum"], "gsquare": s["gsquare"], "training_step": s["training_step"], "beta": s["beta"], "gamma": s["gamma"]},
-    "adamw": lambda s: {"momentum": s["momentum"], "gsquare": s["gsquare"], "training_step": s["training_step"], "beta": s["beta"], "gamma": s["gamma"], "lambda_wd": s["lambda_wd"]}
+    "adamw": lambda s: {"momentum": s["momentum"], "gsquare": s["gsquare"], "training_step": s["training_step"], "beta": s["beta"], "gamma": s["gamma"], "lambda_wd": s["lambda_wd"]},
+    "muon": lambda s: {"momentum": s["momentum"], "gsquare": s["gsquare"], "training_step": s["training_step"], "beta": s["beta"], "gamma": s["gamma"], "lambda_wd": s["lambda_wd"]},
+
 }
 
 def _initialize_momentum(params: ModelParameters, beta: float) -> OptimizerState:
@@ -151,11 +176,15 @@ def _initialize_rmsprop(params: ModelParameters, gamma: float) -> OptimizerState
 def _initialize_adam(params: ModelParameters, beta: float, gamma: float) -> OptimizerState:
     return {"momentum": jax.tree.map(jnp.zeros_like, params), "gsquare": jax.tree.map(jnp.zeros_like, params), "beta": beta, "gamma": gamma, "training_step": 0}
 
-def _initialize_adamw(params: ModelParameters, beta:float, gamma: float, lambda_wd: float) -> OptimizerState:
+def _initialize_adamw(params: ModelParameters, beta: float, gamma: float, lambda_wd: float) -> OptimizerState:
     adam_init = _initialize_adam(params=params, beta=beta, gamma=gamma)
     adamw_init = adam_init | {"lambda_wd": lambda_wd}
 
     return adamw_init
+
+def _initialize_muon(params: ModelParameters, beta: float, gamma: float, lambda_wd: float) -> OptimizerState:
+    # Runs the hybrid of AdamW and Muon initialization
+    return _initialize_adamw(params, beta, gamma, lambda_wd)
 
 class MiniOptimizer:
     def __init__(self, name:str, total_steps:int, warmup_steps: Optional[int]=None, peak_lr:Optional[float]=1e-3, kwargs:dict={}):  # or 3e-4 for Karpathy's constant
@@ -186,6 +215,8 @@ class MiniOptimizer:
             return _initialize_adam(params=params, beta=self.kwargs["beta"], gamma=self.kwargs["gamma"])
         elif self.name == "adamw":
             return _initialize_adamw(params=params, beta=self.kwargs["beta"], gamma=self.kwargs["gamma"], lambda_wd=self.kwargs["lambda_wd"])
+        elif self.name == "muon":
+            return _initialize_muon(params=params, beta=self.kwargs["beta"], gamma=self.kwargs["gamma"], lambda_wd=self.kwargs["lambda_wd"])
 
     def prepare(self, state: OptimizerState) -> OptimizerState:
         return PREPARE[self.name](state)
