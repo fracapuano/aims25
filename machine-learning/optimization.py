@@ -86,8 +86,17 @@ def adam_update(params: ModelParameters, grad: Gradients, momentum: Gradients, g
     }
 
 
-def adamw_update():
-    pass
+def adamw_update(params: ModelParameters, grad: Gradients, momentum: Gradients, gsquare: Gradients, beta: float, gamma: float, learning_rate: float, training_step: int, lambda_wd: float) -> OptimizerState:
+    """Applies the Adam update and then perform weight regularization"""
+    adam_state = adam_update(
+        params=params, grad=grad, momentum=momentum, gsquare=gsquare, beta=beta, gamma=gamma, learning_rate=learning_rate, training_step=training_step
+    )
+
+    p = jax.tree.map(lambda p, old_p: p - lambda_wd * old_p, adam_state["params"], params)
+
+    # last coming key from weight-decay update overwrites old parameters
+    return adam_state | {"params": p, "lambda_wd": lambda_wd}
+
 
 def _2d_muon_update():
     pass
@@ -126,7 +135,8 @@ PREPARE = {
     "momentum": lambda s: {"momentum": s["momentum"], "beta": s["beta"]},
     "adagrad": lambda s: {"gsquare": s["gsquare"]},
     "rmsprop": lambda s: {"gsquare": s["gsquare"], "gamma": s["gamma"]},
-    "adam": lambda s: {"momentum": s["momentum"], "gsquare": s["gsquare"], "training_step": s["training_step"], "beta": s["beta"], "gamma": s["gamma"]}
+    "adam": lambda s: {"momentum": s["momentum"], "gsquare": s["gsquare"], "training_step": s["training_step"], "beta": s["beta"], "gamma": s["gamma"]},
+    "adamw": lambda s: {"momentum": s["momentum"], "gsquare": s["gsquare"], "training_step": s["training_step"], "beta": s["beta"], "gamma": s["gamma"], "lambda_wd": s["lambda_wd"]}
 }
 
 def _initialize_momentum(params: ModelParameters, beta: float) -> OptimizerState:
@@ -140,6 +150,12 @@ def _initialize_rmsprop(params: ModelParameters, gamma: float) -> OptimizerState
 
 def _initialize_adam(params: ModelParameters, beta: float, gamma: float) -> OptimizerState:
     return {"momentum": jax.tree.map(jnp.zeros_like, params), "gsquare": jax.tree.map(jnp.zeros_like, params), "beta": beta, "gamma": gamma, "training_step": 0}
+
+def _initialize_adamw(params: ModelParameters, beta:float, gamma: float, lambda_wd: float) -> OptimizerState:
+    adam_init = _initialize_adam(params=params, beta=beta, gamma=gamma)
+    adamw_init = adam_init | {"lambda_wd": lambda_wd}
+
+    return adamw_init
 
 class MiniOptimizer:
     def __init__(self, name:str, total_steps:int, warmup_steps: Optional[int]=None, peak_lr:Optional[float]=1e-3, kwargs:dict={}):  # or 3e-4 for Karpathy's constant
@@ -168,6 +184,8 @@ class MiniOptimizer:
             return _initialize_rmsprop(params=params, gamma=self.kwargs["gamma"])
         elif self.name == "adam":
             return _initialize_adam(params=params, beta=self.kwargs["beta"], gamma=self.kwargs["gamma"])
+        elif self.name == "adamw":
+            return _initialize_adamw(params=params, beta=self.kwargs["beta"], gamma=self.kwargs["gamma"], lambda_wd=self.kwargs["lambda_wd"])
 
     def prepare(self, state: OptimizerState) -> OptimizerState:
         return PREPARE[self.name](state)
