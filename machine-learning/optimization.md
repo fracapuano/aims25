@@ -1,4 +1,4 @@
-# A short note on optimizing NNs.
+ # A short note on optimizing NNs.
 
 Take a NN parametrized with parameters $ \theta $. 
 During training, the parameters are updated using differential information relating the performance obtained to the weights used, i.e. using $\nabla L (\theta) = \sum_{i \in \mathcal{D}} \nabla \ell_i (\theta) $, so that weights are iteratively updated according to:
@@ -16,7 +16,7 @@ Note how SGD still performs an update for the entire parameter vector $\theta$, 
 The [infamous Adam](https://x.com/2prime_PKU/status/1948549824594485696) update rule suggests weights should be updated using:
 
 $$
-\theta_{t+1} = \theta_t - \eta \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon}
+\theta_{t} = \theta_{t-1} - \eta \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon}
 $$
 
 There are multiple aspects in this update rule.
@@ -31,7 +31,7 @@ In practice, by defining a coefficient $\beta$ regulating the relevance of *past
 
 $$
 \begin{align*}
-\theta_{t+1} &= \theta_t - \eta \cdot m_t , \quad m_t = \beta m_{t-1} + (1-\beta) g_t \\
+\theta_{t} &= \theta_{t-1} - \eta \cdot m_t , \quad m_t = \beta m_{t-1} + (1-\beta) g_t \\
 g_t &= \sum_{k \in \mathcal{B}} \nabla \ell_k (\theta_t)
 \end{align*}
 $$
@@ -39,6 +39,7 @@ $$
 This update rule maintains previous gradients relevant according to the parameter $\beta$: for $\beta \to 1$ previous gradients dominate the current gradient estimate, whereas for $\beta \to 0$ the current gradient estimate has the most impact on the parameter update.
 Crucially, while momentum naturally accomodates for a possibly time-dependant learning rate $\eta = \eta_t$, it still uses an equal learning rate for all parameters, resulting in the need to perform significant tuning to improve practical performance.
 Momentum was first introduced by the Soviet mathematician Polyak in the 1960s.
+Alternatively, $m_t = \beta m_{t-1} + g_t$ is also a valid momentum formulation.
 
 
 #### Nesterov Momentum
@@ -106,11 +107,12 @@ In Adam, Kingma et al. propose bias-correcting the current estimate for $m_t$ an
 Formally,
 $$
 \begin{align*}
-\hat{m}_t &= \frac{m_t}{1 - \beta^t} \implies \hat{m}_t \xrightarrow[t \to \infty]{} m_t \\
-\hat{v}_t &= \frac{v_t}{1 - \gamma^t} \implies \hat{v}_t \xrightarrow[t \to \infty]{} v_t\\
+\hat{m}_t &= \frac{m_t}{1 - \beta^t} \implies \hat{m}_t \xrightarrow[]{t \to \infty} m_t \\
+\hat{v}_t &= \frac{v_t}{1 - \gamma^t} \implies \hat{v}_t \xrightarrow[]{t \to \infty} v_t\\
 \end{align*}
 $$
 
+Together with Momentum and the RMSProp update, bias correction fully describes the Adam update rule.
 
 ## [AdamW](https://arxiv.org/abs/1711.05101)
 Regularizing the training of NNs has shown premise in improving train-test generalization.
@@ -124,3 +126,28 @@ $$
 \theta_{t} = \theta_{t-1} + \eta \bigg( \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon} + \lambda \theta_{t-1} \bigg) \tag{AdamW}
 \end{equation*}
 $$
+
+## [Muon](https://jeremybernste.in/writing/deriving-muon)
+
+Muon ([Keller Jordan's blogpost](https://kellerjordan.github.io/posts/muon/) and [Jeremy Bernstein's blogpost](https://jeremybernste.in/writing/deriving-muon)) addresses a fundamental limitation of practical first-order optimization when training NNs: updates for 2D parameters are oftentimes dominated by specific dimensions.
+Formally, this plays out making the update matrix for any set of 2D-parameters $\nabla_W L(\theta), \theta \supset W $ to be almost low rank.
+Adaptive learning rates attempts at mitigating this very same issue by scaling down the learning rate to prevent too large updates, but ultimately fails at ensuring enough dimensions in the parameter space are updated when the update matrix is empirically low rank due to the parameters (i.e., the rows of $\nabla_W L(\theta)$) being considered *independently*. 
+This means that even with adaptive learning rates, the update matrix $\frac{\eta}{\sqrt{v_t}} \nabla_W L(\theta)$ is in practice more elliptical than speric, resulting in poorer fit.
+
+*Orthogonalizing* the update matrix results in the Muon update rule (for linear layers only):
+$$
+\begin{align*}
+M_t &= \beta M_{t-1} + \nabla_{W_{t-1}} L(\theta) \\
+O_t &= \operatorname{Orthogonalize(M_t)} \\
+W_t &= W_{t-1} - \eta O_t, \tag{Muon}
+\end{align*}
+$$
+
+A theoretically-justified (yet excessively expensive) orthogonalization technique is Singular Value Decomposition, resulting in $O_t = U_tV_t^\top, \, M_t = U_t \Sigma_t V_t^\top$.
+Numerically, this rapidly proves prohibitive from a computational standpoint, resulting in the need to develop approximate orthogonalization techniques.
+One such approximate orthogonalization routine is the Netwon-Schultz-$k$, approximating $U_t V_t^\top$ applying $n$ times an odd-matrix polynomial of degree $N$ (typically, $N=3$ or $N=5$).
+Formally, this follows from the fact that given an odd-matrix polynomial of degree $N, \, p_N(X)$ commutes with the SVD decomposition of $X$, resulting in $p_N(U \Sigma V^\top) = U p_N (\Sigma) V^\top$.
+Furthermore one can show that $ \underbrace{p_N \circ p_N \dots \circ p_N}_{k \text{ times}}(X) = U p^k_N(\Sigma) V^\top$.
+Therefore, finding $p^*_N: p^*_N(\Sigma) \approx I$ and applying it to $X$ is an effective way to orthogonalize the matrix $X$, thereby approximating $UV^\top$.
+Searching for said polynomials is arbitrarily complex, and in practice this can be made simpler by fixing the degree of the polynomial, and applying it (either the same, but can also be different) $k$ times.
+Together, this results in the Newton-Schultz-$k$ routine used in Muon to orthogonalize the gradient momentum $M_t$.
