@@ -92,7 +92,7 @@ def adamw_update(params: ModelParameters, grad: Gradients, momentum: Gradients, 
         params=params, grad=grad, momentum=momentum, gsquare=gsquare, beta=beta, gamma=gamma, learning_rate=learning_rate, training_step=training_step
     )
 
-    p = jax.tree.map(lambda p, old_p: p - lambda_wd * old_p, adam_state["params"], params)
+    p = jax.tree.map(lambda p, old_p: p - learning_rate * lambda_wd * old_p, adam_state["params"], params)
 
     # last coming key from weight-decay update overwrites old parameters
     return adam_state | {"params": p, "lambda_wd": lambda_wd}
