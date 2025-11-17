@@ -2,20 +2,20 @@ A fun way to learn a few things in a short time.
 
 ## What
 
-- [ ] A flow-matching network using nothing but linear algebra operations...
-- [ ] Optimized using AdamW and Muon...
-- [ ] For EEG-to-MEG conversion...
-- [ ] In Jax
+- [x] A flow-matching network using nothing but linear algebra operations...
+- [x] Optimized using AdamW and Muon...
+- [x] For EEG-to-MEG conversion...
+- [x] In Jax
 
 ## Why
 
 Because I want to actually learn
 
-- [ ] flow matching...
-- [ ] Haven't implemented a bare NN in a long time
-- [ ] Have never implemented any advanced optimizer
-- [ ] Want to start back the "Mind the Gap" project
-- [ ] Need to improve my command over Jax
+- [x] flow matching...
+- [x] Haven't implemented a bare NN in a long time
+- [x] Have never implemented any advanced optimizer
+- [x] Want to start back the "Mind the Gap" project
+- [x] Need to improve my command over Jax
 
 ## When
 
