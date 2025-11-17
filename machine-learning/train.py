@@ -112,7 +112,7 @@ def main():
     eval_every = 3
 
     optimizer_config = dict(
-        name = "adamw",
+        name = "muon",
         total_steps = (n_epochs - 1) * len(train_dataloader),
         warmup_steps = len(train_dataloader),
         kwargs={"beta": 0.99, "gamma": 0.9, "lambda_wd": 1e-3}
