@@ -115,7 +115,8 @@ def main():
         name = "muon",
         total_steps = (n_epochs - 1) * len(train_dataloader),
         warmup_steps = len(train_dataloader),
-        kwargs={"beta": 0.99, "gamma": 0.9, "lambda_wd": 1e-3}
+        kwargs={"beta": 0.99, "gamma": 0.9, "lambda_wd": 1e-3},
+        peak_lr=5e-2,
     )
 
     training_config["optimizer_config"] = optimizer_config
